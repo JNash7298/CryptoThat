@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">CryptoThat</string>
+    <string name="LogoBannerDescription">Logo Banner</string>
+    <string name="UsernameHintText">Username</string>
+    <string name="PasswordHintText">Password</string>
+    <string name="PasswordConfirmationHintText">Confirm Password</string>
+    <string name="EmailHintText">Email</string>
+    <string name="login_LoginButtonText">Login</string>
+    <string name="login_RegisterButtonText">Register</string>
+    <string name="login_RegisteredQuestionLabel">New Here?</string>
+    <string name="register_ReturnToLoginButtonText">Back</string>
+    <string name="register_RegisterButtonText">Register</string>
 </resources>
