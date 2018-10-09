@@ -61,6 +61,15 @@
             app:layout_constraintVertical_bias="0.0">
 
             <EditText
+                android:id="@+id/register_EmailTextEntry"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:ems="10"
+                android:hint="@string/EmailHintText"
+                android:inputType="textEmailAddress" />
+
+            <EditText
                 android:id="@+id/register_UsernameTextEntry"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
@@ -87,18 +96,9 @@
                 android:hint="@string/PasswordConfirmationHintText"
                 android:inputType="textPassword" />
 
-            <EditText
-                android:id="@+id/register_EmailTextEntry"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:ems="10"
-                android:hint="@string/EmailHintText"
-                android:inputType="textEmailAddress" />
-
             <Button
                 android:id="@+id/RegisterButton"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:text="@string/register_RegisterButtonText" />

@@ -10,4 +10,10 @@
     <string name="login_RegisteredQuestionLabel">New Here?</string>
     <string name="register_ReturnToLoginButtonText">Back</string>
     <string name="register_RegisterButtonText">Register</string>
+    <string name="login_PasswordForgotLabel">Forgot your password?</string>
+    <string name="forgotPassword_EmailSubmitTitleText">Forgot Password?</string>
+    <string name="forgotPassword_EmailSubmitDescriptionText">Please enter the email address for
+        your account.</string>
+    <string name="forgotPassword_EmailHint">Email</string>
+    <string name="forgotPassword_SubmitButtonText">Send Email</string>
 </resources>

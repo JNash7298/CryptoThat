@@ -3,5 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="blackLabelColor">#000000</color>
+    <color name="login_RegisterLabelColor">#000000</color>
+    <color name="login_ForgotPasswordLabel">#388e3c</color>
+    <color name="forgotPassword_TitleColor">#000000</color>
+    <color name="forgotPassword_DescriptionColor">#606060</color>
 </resources>

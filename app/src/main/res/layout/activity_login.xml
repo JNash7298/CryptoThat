@@ -21,7 +21,7 @@
         android:layout_gravity="end">
 
         <LinearLayout
-            android:id="@+id/login_UsernamePasswordLoginField"
+            android:id="@+id/login_EmailPasswordLoginField"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:elevation="1dp"
@@ -36,13 +36,13 @@
             app:layout_constraintVertical_bias="0.0">
 
             <EditText
-                android:id="@+id/login_UsernameTextEntry"
+                android:id="@+id/login_EmailTextEntry"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:ems="10"
-                android:hint="@string/UsernameHintText"
-                android:inputType="text" />
+                android:hint="@string/EmailHintText"
+                android:inputType="textEmailAddress" />
 
             <EditText
                 android:id="@+id/login_PasswordTextEntry"
@@ -56,11 +56,21 @@
 
             <Button
                 android:id="@+id/LoginButton"
-                android:layout_width="75dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/login_LoginButtonText" />
+
+            <TextView
+                android:id="@+id/login_ForgotPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:padding="2dp"
+                android:text="@string/login_PasswordForgotLabel"
+                android:textColor="@color/login_ForgotPasswordLabel" />
 
         </LinearLayout>
 
@@ -88,7 +98,7 @@
                 android:layout_marginEnd="15dp"
                 android:layout_marginTop="2dp"
                 android:text="@string/login_RegisteredQuestionLabel"
-                android:textColor="@color/blackLabelColor"
+                android:textColor="@color/login_RegisterLabelColor"
                 app:layout_constraintBottom_toTopOf="@+id/login_RegisterButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
