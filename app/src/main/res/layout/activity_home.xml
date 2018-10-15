@@ -1,9 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.HomeActivity">
+    android:orientation="vertical"
+    tools:context=".activities.LoginActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <ImageView
+        android:id="@+id/login_Banner"
+        android:layout_width="match_parent"
+        android:layout_height="125dp"
+        android:contentDescription="@string/LogoBannerDescription"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/placeholder" />
+
+    <LinearLayout
+        android:id="@+id/home_NavagationField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingEnd="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="5dp">
+
+        <Button
+            android:id="@+id/home_CipherButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/home_CipherButtonText" />
+
+        <Button
+            android:id="@+id/home_MessageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/home_MessageButtonText" />
+
+        <ImageButton
+            android:id="@+id/home_SettingButtton"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/home_SettingButtonDescription"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/placeholder" />
+    </LinearLayout>
+
+</LinearLayout>

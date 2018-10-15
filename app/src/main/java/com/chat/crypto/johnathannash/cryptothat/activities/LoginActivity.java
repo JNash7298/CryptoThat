@@ -14,8 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.chat.crypto.johnathannash.cryptothat.R;
-import com.chat.crypto.johnathannash.cryptothat.authenticator.FirebaseAuthenticator;
-import com.chat.crypto.johnathannash.cryptothat.interfaces.Authentication;
 import com.chat.crypto.johnathannash.cryptothat.models.LoginDataModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,8 +23,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "test";
-    private Authentication authenticator;
+    private static final String TAG = "Login";
+    private FirebaseAuth auth;
     public LoginDataModel loginData;
 
     @Override
@@ -41,8 +39,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        authenticator.checkCurrentUser();
+        FirebaseUser user = auth.getCurrentUser();
+        updateUI(user);
     }
 
     private void setupEvents(){
@@ -85,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setupFireBaseAuthentication(){
-        authenticator = new FirebaseAuthenticator(this);
+        auth = FirebaseAuth.getInstance();
         loginData = new LoginDataModel();
     }
 
@@ -126,14 +124,26 @@ public class LoginActivity extends AppCompatActivity {
 
         }
         else{
-            if(authenticator.loginWithEmailPassword(this, loginData)){
-                Log.d(TAG, "signInWithEmail:success");
-            }
-            else{
-                Log.w(TAG, "signInWithEmail:failure");
-                Toast.makeText(LoginActivity.this, "Email or Password is incorrect.",
-                        Toast.LENGTH_SHORT).show();
-            }
+            auth.signInWithEmailAndPassword(loginData.getEmail(), loginData.getPassWord())
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            checkSuccessfulLogin(task);
+                        }
+                    });
+        }
+    }
+
+    private void checkSuccessfulLogin(Task<AuthResult> task) {
+        if (task.isSuccessful()) {
+            Log.d(TAG, "signInWithEmail:success");
+            FirebaseUser user = auth.getCurrentUser();
+            updateUI(user);
+        } else {
+            Log.w(TAG, "signInWithEmail:failure", task.getException());
+            Toast.makeText(LoginActivity.this, "Email or Password is incorrect.",
+                    Toast.LENGTH_SHORT).show();
+            updateUI(null);
         }
     }
 

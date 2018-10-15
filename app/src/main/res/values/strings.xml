@@ -16,4 +16,8 @@
         your account.</string>
     <string name="forgotPassword_EmailHint">Email</string>
     <string name="forgotPassword_SubmitButtonText">Send Email</string>
+    <string name="home_SettingButtonDescription">Settings</string>
+    <string name="home_MessageButtonText">Messages</string>
+    <string name="home_CipherButtonText">Ciphers</string>
+    <string name="TempString">Temp Test</string>
 </resources>

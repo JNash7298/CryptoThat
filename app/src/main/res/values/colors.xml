@@ -7,4 +7,9 @@
     <color name="login_ForgotPasswordLabel">#388e3c</color>
     <color name="forgotPassword_TitleColor">#000000</color>
     <color name="forgotPassword_DescriptionColor">#606060</color>
+    <color name="message_ChatBubbleFromYou">#cfd8dc</color>
+    <color name="message_ChatBubbleFromSender">#b388ff</color>
+    <color name="TempProfileColor">#1de9b6</color>
+    <color name="myMessageColor">#000000</color>
+    <color name="otherMessageColor">#000000</color>
 </resources>
