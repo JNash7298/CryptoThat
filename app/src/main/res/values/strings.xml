@@ -20,4 +20,5 @@
     <string name="home_MessageButtonText">Messages</string>
     <string name="home_CipherButtonText">Ciphers</string>
     <string name="TempString">Temp Test</string>
+    <string name="forgotPassword_backButton">Back</string>
 </resources>

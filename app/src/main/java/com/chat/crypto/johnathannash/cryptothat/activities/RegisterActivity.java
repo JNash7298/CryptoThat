@@ -18,8 +18,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+
+import java.util.ArrayList;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -40,6 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
         final LinearLayout view = findViewById(R.id.register_UsernamePasswordEmailRegisterField);
         for(int child = 0; child < view.getChildCount(); child++){
             if(view.getChildAt(child) instanceof EditText){
+                final int finalChild = child;
                 ((EditText) view.getChildAt(child)).addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -51,7 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        textChanged(view, s.toString());
+                        textChanged(view.getChildAt(finalChild), s.toString());
                     }
                 });
             }
@@ -110,31 +115,66 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registerAttempt() {
-        if(registerData.getUserName().isEmpty()){
+        Boolean emptyFields;
+        StringBuilder missingFields = new StringBuilder();
+        ArrayList<String> missing = new ArrayList<>();
 
-        } else if(registerData.getEmail().isEmpty()){
+        if((emptyFields = (registerData.getEmail() == null
+                || registerData.getEmail().isEmpty()))){
+            missing.add("Email");
+        }
+        if(emptyFields
+                || (emptyFields = (registerData.getUserName() == null
+                || registerData.getUserName().isEmpty()))){
+            missing.add("Username");
+        }
+        if(emptyFields
+                || (emptyFields = (registerData.getPassWord() == null
+                || registerData.getPassWord().isEmpty()))){
+            missing.add("Password");
+        }
+        if(emptyFields
+                || (emptyFields = (registerData.getConfirmationPassWord() == null
+                || registerData.getConfirmationPassWord().isEmpty()))){
+            missing.add("Password Confirmation");
+        }
 
-        } else if(registerData.getPassWord().isEmpty()){
-
-        } else if(registerData.getConfirmationPassWord().isEmpty()){
-
-        } else if(registerData.getPassWord().equals(registerData.getConfirmationPassWord())){
-            auth.createUserWithEmailAndPassword(registerData.getEmail(), registerData.getPassWord())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            checkIfSuccessfulRegister(task);
-                        }
-                    });
+        if(!emptyFields){
+            if(!registerData.getPassWord().equals(registerData.getConfirmationPassWord())) {
+                Toast.makeText(this,
+                        "Password and confirmation password are not the same."
+                        , Toast.LENGTH_SHORT).show();
+            } else if(registerData.getPassWord().length() < 6){
+                Toast.makeText(this,
+                        "Password is too simple, you need a password of a minimum a 6 characters in length."
+                        , Toast.LENGTH_SHORT).show();
+            } else{
+                auth.createUserWithEmailAndPassword(registerData.getEmail(), registerData.getPassWord())
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                checkIfSuccessfulRegister(task);
+                            }
+                        });
+            }
         } else{
-
+            missingFields.append("You are missing");
+            for(int field = 0; field < missing.size(); field++){
+                if(missing.size() > 1 && field == missing.size() - 1){
+                       missingFields.append(", and ").append(missing.get(field));
+                } else{
+                    missingFields.append(", ").append(missing.get(field));
+                }
+            }
+            missingFields.append(".");
+            Toast.makeText(this, missingFields.toString(), Toast.LENGTH_LONG).show();;
         }
     }
 
     private void checkIfSuccessfulRegister(Task<AuthResult> task){
         if (task.isSuccessful()) {
             Log.d(TAG, "createUserWithEmail:success");
-            FirebaseUser user = auth.getCurrentUser();
+            final FirebaseUser user = auth.getCurrentUser();
 
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                     .setDisplayName(registerData.getUserName())
@@ -146,23 +186,34 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "User profile updated.");
+                            updateUI(user);
                         }
                     }
                 });
             }
-
-            updateUI(user);
         } else {
-            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-            Toast.makeText(this, "Registration failed.",
-                    Toast.LENGTH_SHORT).show();
+            if (task.getException() instanceof FirebaseAuthUserCollisionException){
+                Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                Toast.makeText(this, registerData.getEmail() + " is an unusable email.",
+                        Toast.LENGTH_SHORT).show();
+            }else if(task.getException() instanceof FirebaseAuthInvalidCredentialsException){
+                Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                Toast.makeText(this, registerData.getEmail() + " is not in valid email format.",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                Toast.makeText(this, "Registration failed.",
+                        Toast.LENGTH_SHORT).show();
+            }
             updateUI(null);
         }
     }
 
-    public void updateUI(FirebaseUser user){
+    private void updateUI(FirebaseUser user){
         if(user != null){
-
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
         }
     }
 }

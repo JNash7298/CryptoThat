@@ -80,6 +80,12 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         }
+        findViewById(R.id.login_RegisterButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buttonPressed(v);
+            }
+        });
     }
 
     private void setupFireBaseAuthentication(){
@@ -147,9 +153,9 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void updateUI(FirebaseUser user){
+    private void updateUI(FirebaseUser user){
         if(user != null){
-
+            Toast.makeText(this, user.getDisplayName(), Toast.LENGTH_SHORT).show();
         }
     }
 }

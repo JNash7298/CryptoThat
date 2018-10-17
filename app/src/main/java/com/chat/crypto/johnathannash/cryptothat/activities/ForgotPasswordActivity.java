@@ -29,6 +29,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         Fragment fragment = new ForgotPasswordSubmitEmailFragment();
         fragmentTransaction.add(R.id.forgotPassword_fragmentContainer, fragment);
 
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 }
