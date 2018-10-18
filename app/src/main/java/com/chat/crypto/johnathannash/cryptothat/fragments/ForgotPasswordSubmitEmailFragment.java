@@ -88,7 +88,6 @@ public class ForgotPasswordSubmitEmailFragment extends Fragment {
     }
 
     private void sendEmail(){
-
         Toast.makeText(getActivity(), email, Toast.LENGTH_SHORT).show();
         //EditText tempText = getActivity().findViewById(R.id.forgotPassword_EmailEntryField);
     }

@@ -155,7 +155,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user){
         if(user != null){
+            Intent intent;
             Toast.makeText(this, user.getDisplayName(), Toast.LENGTH_SHORT).show();
+            if(user.isEmailVerified()){
+                intent = new Intent(this, HomeActivity.class);
+            }
+            else{
+
+            }
         }
     }
 }
