@@ -21,4 +21,19 @@
     <string name="home_CipherButtonText">Ciphers</string>
     <string name="TempString">Temp Test</string>
     <string name="forgotPassword_backButton">Back</string>
+    <string name="profileSetup_ProfileImageDescription">Profile Image</string>
+    <string name="profileSetup_ChangePassword">Change Password</string>
+    <string name="profileSetup_ChangeEmail">Change Email</string>
+    <string name="profileSetup_ReturnButton">Back</string>
+    <string name="profileSetup_VerifyButton">Verify Email</string>
+    <string name="profileSetup_ChangeUserName">Change Username</string>
+    <string name="profileSetup_ChangeProfileImage">Change Image</string>
+    <string name="home_LogoutButton">Logout</string>
+    <string name="changeEmailPopup_LabelText">New Email:</string>
+    <string name="changeEmailPopup_Hint">example@email.com</string>
+    <string name="changeEmailPopup_SubmitButton">Submit</string>
+    <string name="reLoginPopup_TitleText">Relogin</string>
+    <string name="reLoginPopup_LoginButton">Login</string>
+    <string name="changeUsernamePopup_Hint">Starfish123</string>
+    <string name="changeUsernamePopup_LabelText">New Username:</string>
 </resources>

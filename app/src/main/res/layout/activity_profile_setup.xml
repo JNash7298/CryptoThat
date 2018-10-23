@@ -2,8 +2,156 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profileSetup_Profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.ProfileSetupActivity">
+
+    <ImageView
+        android:id="@+id/profileSetup_ProfileImage"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:contentDescription="@string/profileSetup_ProfileImageDescription"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/profileSetup_ProfileName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="10dp"
+        android:ems="7"
+        android:paddingEnd="0dp"
+        android:paddingStart="5dp"
+        android:textColor="@color/profileSetup_NameColor"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/profileSetup_ProfileImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.086" />
+
+    <Button
+        android:id="@+id/profileSetup_ChangeUsernameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/profileSetup_ChangeUserName"
+        app:layout_constraintBottom_toBottomOf="@+id/divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/profileSetup_ProfileImage"
+        app:layout_constraintTop_toBottomOf="@+id/profileSetup_ProfileName"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:drawable/divider_horizontal_dark"
+        android:backgroundTint="@color/forgotPassword_TitleColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileSetup_ProfileImage"
+        app:layout_constraintVertical_bias="0.112" />
+
+    <Button
+        android:id="@+id/profileSetup_ChangePasswordButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/profileSetup_ChangePassword"
+        app:layout_constraintBottom_toTopOf="@+id/divider3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/profileSetup_ChangeEmailButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/profileSetup_ChangeEmail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileSetup_ChangePasswordButton" />
+
+    <TextView
+        android:id="@+id/profileSetup_EmailAddressString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="23dp"
+        android:isScrollContainer="true"
+        android:scrollHorizontally="true"
+        android:text="@string/TempString"
+        android:textColor="@color/profileSetup_EmailColor"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/profileSetup_ChangeEmailButton"
+        app:layout_constraintTop_toBottomOf="@+id/profileSetup_ChangePasswordButton" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="10dp"
+        android:background="@android:drawable/divider_horizontal_dark"
+        android:backgroundTint="@color/forgotPassword_TitleColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider"
+        app:layout_constraintVertical_bias="0.287" />
+
+    <Button
+        android:id="@+id/profileSetup_ReturnButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/profileSetup_ReturnButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider3"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/profileSetup_ProfileImageChangeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/profileSetup_ChangeProfileImage"
+        app:layout_constraintBottom_toTopOf="@+id/divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileSetup_ProfileImage"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

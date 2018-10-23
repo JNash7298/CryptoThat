@@ -27,6 +27,9 @@ public class ForgotPasswordSubmitEmailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle retrival = this.getArguments();
+        email = retrival.getString("email");
     }
 
     @Override
@@ -40,6 +43,8 @@ public class ForgotPasswordSubmitEmailFragment extends Fragment {
     private void setupEvents(){
         Button tempButton = view.findViewById(R.id.forgotPassword_EmailSubmitButton);
         EditText tempText = view.findViewById(R.id.forgotPassword_EmailEntryField);
+
+        tempText.setText(email);
 
         tempButton.setOnClickListener(new View.OnClickListener() {
             @Override

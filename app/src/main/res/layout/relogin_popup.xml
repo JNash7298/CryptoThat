@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/reLoginPopup_TitleText"
+        android:textColor="@color/forgotPassword_TitleColor"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/reloginPopup_Email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/EmailHintText"
+            android:inputType="textEmailAddress" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/reloginPopup_Password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/PasswordHintText"
+            android:inputType="textPassword" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/relogin_ForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="@string/login_PasswordForgotLabel"
+        android:textColor="@color/login_ForgotPasswordLabel" />
+
+    <Button
+        android:id="@+id/reloginPopup_LoginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:text="@string/reLoginPopup_LoginButton" />
+
+</LinearLayout>

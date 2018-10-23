@@ -7,8 +7,13 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.chat.crypto.johnathannash.cryptothat.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class HomeActivity extends AppCompatActivity {
+
+    private FirebaseUser user;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +21,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         setupEvents();
+        user = getIntent().getParcelableExtra("user");
+        auth = FirebaseAuth.getInstance();
     }
 
     private void setupEvents(){
@@ -39,6 +46,10 @@ public class HomeActivity extends AppCompatActivity {
                 intent = new Intent(this, MessageActivity.class);
                 break;
             case R.id.home_SettingButtton:
+                break;
+            case R.id.home_LogoutButton:
+                auth.signOut();
+                intent = new Intent(this, LoginActivity.class);
                 break;
         }
 

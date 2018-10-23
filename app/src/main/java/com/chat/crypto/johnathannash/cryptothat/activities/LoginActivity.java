@@ -129,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
         else if(loginData.getPassWord().isEmpty()){
 
         }
-        else{
+        else {
             auth.signInWithEmailAndPassword(loginData.getEmail(), loginData.getPassWord())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -159,10 +159,15 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, user.getDisplayName(), Toast.LENGTH_SHORT).show();
             if(user.isEmailVerified()){
                 intent = new Intent(this, HomeActivity.class);
+                intent.putExtra("user", user);
             }
-            else{
-
+            else {
+                intent = new Intent(this, ProfileSetupActivity.class);
+                intent.putExtra("Unverified", true);
+                intent.putExtra("OneWay", true);
+                intent.putExtra("user", user);
             }
+            startActivity(intent);
         }
     }
 }
