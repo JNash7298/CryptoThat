@@ -1,19 +1,26 @@
 package com.chat.crypto.johnathannash.cryptothat.activities;
 
 import android.app.Dialog;
+import android.arch.core.util.Function;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chat.crypto.johnathannash.cryptothat.R;
+import com.chat.crypto.johnathannash.cryptothat.helpers.FirebaseDBHandler;
+import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -30,6 +37,9 @@ public class ProfileSetupActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private TextView userName, email;
     private static final String TAG = "profileSetup";
+    private FirebaseDBHandler dbHandler;
+    private UserPublicData userData;
+    private ImageView avatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +50,27 @@ public class ProfileSetupActivity extends AppCompatActivity {
         oneWay = getIntent().getBooleanExtra("OneWay", false);
         user = getIntent().getParcelableExtra("user");
         auth = FirebaseAuth.getInstance();
+        dbHandler = new FirebaseDBHandler();
 
+        dbHandler.retrievePublicUserData(this);
         setup();
+    }
+
+    public void ProvideUserData(UserPublicData userData){
+        this.userData = userData;
     }
 
     private void setup(){
         email = findViewById(R.id.profileSetup_EmailAddressString);
         userName = findViewById(R.id.profileSetup_ProfileName);
+        avatar = findViewById(R.id.profileSetup_ProfileImage);
 
         email.setText(user.getEmail());
         userName.setText(user.getDisplayName());
+        if(userData == null){
+            String colorHex = "#" + Integer.toHexString(ContextCompat.getColor(this, R.color.temp_profileColor) & 0x00ffffff);
+            avatar.setBackground(new ColorDrawable(Color.parseColor(colorHex)));
+        }
 
         ConstraintLayout temp = findViewById(R.id.profileSetup_Profile);
         for(int index = 0; index < temp.getChildCount(); index++){
@@ -104,15 +125,22 @@ public class ProfileSetupActivity extends AppCompatActivity {
                         ((EditText) relogin.findViewById(R.id.reloginPopup_Email)).getText().toString()
                         , ((EditText) relogin.findViewById(R.id.reloginPopup_Password)).getText().toString());
                 user = auth.getCurrentUser();
-                user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            requestNewEmail();
+                if (user != null) {
+                    user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                requestNewEmail();
+                            }
+                            relogin.dismiss();
                         }
-                        relogin.dismiss();
-                    }
-                });
+                    });
+                }
+                else{
+                    Toast.makeText(ProfileSetupActivity.this, "Unable to reauthenticate. Please login back in and try again.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(ProfileSetupActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
             }
         });
         relogin.findViewById(R.id.relogin_ForgotPassword).setOnClickListener(
@@ -219,9 +247,13 @@ public class ProfileSetupActivity extends AppCompatActivity {
                     , Toast.LENGTH_SHORT).show();
         }
         userName.setText(user.getDisplayName());
+
+        if(userData != null){
+            userData.setName(user.getDisplayName());
+            dbHandler.updatePublicUserData(userData);
+        }
         popup.dismiss();
     }
-
     private void verifyEmail(){
         user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -230,6 +262,15 @@ public class ProfileSetupActivity extends AppCompatActivity {
                     Toast.makeText(ProfileSetupActivity.this,
                             "Verification email sent to " + user.getEmail(),
                             Toast.LENGTH_SHORT).show();
+
+                    UserPublicData initial = new UserPublicData();
+                    initial.setName(user.getDisplayName());
+                    initial.setAvatar("#" + Integer.toHexString(ContextCompat.getColor(ProfileSetupActivity.this, R.color.temp_profileColor) & 0x00ffffff));
+                    initial.setUid(user.getUid());
+                    dbHandler.setUserPublicData(initial);
+
+                    Intent intent = new Intent(ProfileSetupActivity.this, LoginActivity.class);
+                    startActivity(intent);
                 } else {
                     Log.e(TAG, "sendEmailVerification", task.getException());
                     Toast.makeText(ProfileSetupActivity.this,
@@ -243,7 +284,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        if(!oneWay){
+        if(!oneWay && !user.isEmailVerified()){
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
@@ -252,7 +293,10 @@ public class ProfileSetupActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        oneWay = false;
+        if(!user.isEmailVerified()){
+            auth.signOut();
+            oneWay = false;
+        }
     }
 
     @Override

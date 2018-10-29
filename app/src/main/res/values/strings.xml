@@ -36,4 +36,7 @@
     <string name="reLoginPopup_LoginButton">Login</string>
     <string name="changeUsernamePopup_Hint">Starfish123</string>
     <string name="changeUsernamePopup_LabelText">New Username:</string>
+    <string name="contactsFragment_SearchBarHint">Search for User</string>
+    <string name="contactsFragment_SearchImageDescription">Search</string>
+    <string name="contactData_Avatar">Avatar</string>
 </resources>

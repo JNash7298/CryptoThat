@@ -7,13 +7,28 @@
     android:orientation="vertical"
     tools:context=".activities.LoginActivity">
 
-    <ImageView
-        android:id="@+id/login_Banner"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="125dp"
-        android:contentDescription="@string/LogoBannerDescription"
-        android:scaleType="fitXY"
-        app:srcCompat="@drawable/placeholder" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/home_ProfileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:elevation="1dp" />
+
+        <ImageView
+            android:id="@+id/login_Banner"
+            android:layout_width="match_parent"
+            android:layout_height="125dp"
+            android:contentDescription="@string/LogoBannerDescription"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/placeholder" />
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/home_NavagationField"
@@ -55,5 +70,12 @@
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/placeholder" />
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/home_ContactsFragmentFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 
 </LinearLayout>

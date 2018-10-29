@@ -2,6 +2,7 @@ package com.chat.crypto.johnathannash.cryptothat.activities;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -13,7 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.chat.crypto.johnathannash.cryptothat.R;
+import com.chat.crypto.johnathannash.cryptothat.helpers.FirebaseDBHandler;
 import com.chat.crypto.johnathannash.cryptothat.models.RegisterDataModel;
+import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -140,7 +143,11 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if(!emptyFields){
-            if(!registerData.getPassWord().equals(registerData.getConfirmationPassWord())) {
+            if(registerData.getUserName().equalsIgnoreCase("admin")){
+                Toast.makeText(this,
+                        "The user name " + registerData.getUserName() + " is not a usable username."
+                        , Toast.LENGTH_SHORT).show();
+            } else if(!registerData.getPassWord().equals(registerData.getConfirmationPassWord())) {
                 Toast.makeText(this,
                         "Password and confirmation password are not the same."
                         , Toast.LENGTH_SHORT).show();

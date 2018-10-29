@@ -2,6 +2,7 @@ package com.chat.crypto.johnathannash.cryptothat.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 
 import com.chat.crypto.johnathannash.cryptothat.R;
 import com.chat.crypto.johnathannash.cryptothat.activities.LoginActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -22,14 +25,19 @@ public class ForgotPasswordSubmitEmailFragment extends Fragment {
 
     private View view;
     private String email;
-    FirebaseApp app;
+    private FirebaseAuth auth;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle retrival = this.getArguments();
-        email = retrival.getString("email");
+        Bundle retrieval = this.getArguments();
+
+        if (retrieval != null) {
+            email = retrieval.getString("email");
+        }
+
+        auth = FirebaseAuth.getInstance();
     }
 
     @Override
@@ -93,7 +101,13 @@ public class ForgotPasswordSubmitEmailFragment extends Fragment {
     }
 
     private void sendEmail(){
-        Toast.makeText(getActivity(), email, Toast.LENGTH_SHORT).show();
-        //EditText tempText = getActivity().findViewById(R.id.forgotPassword_EmailEntryField);
+        auth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(getActivity(), "Reset password email send to " + email + ".", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
