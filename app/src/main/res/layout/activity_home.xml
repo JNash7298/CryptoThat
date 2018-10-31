@@ -54,14 +54,6 @@
             android:layout_weight="1"
             android:text="@string/home_CipherButtonText" />
 
-        <Button
-            android:id="@+id/home_MessageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="1dp"
-            android:text="@string/home_MessageButtonText" />
-
         <ImageButton
             android:id="@+id/home_SettingButtton"
             android:layout_width="100dp"

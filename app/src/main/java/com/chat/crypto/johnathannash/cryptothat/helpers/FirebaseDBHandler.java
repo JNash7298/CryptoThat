@@ -1,20 +1,21 @@
 package com.chat.crypto.johnathannash.cryptothat.helpers;
 
-import android.arch.core.util.Function;
+import android.app.Activity;
+import android.app.Fragment;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.chat.crypto.johnathannash.cryptothat.activities.HomeActivity;
 import com.chat.crypto.johnathannash.cryptothat.activities.ProfileSetupActivity;
 import com.chat.crypto.johnathannash.cryptothat.fragments.ContactsFragment;
+import com.chat.crypto.johnathannash.cryptothat.fragments.FindContactsFragment;
+import com.chat.crypto.johnathannash.cryptothat.models.RoomMemberData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPrivateData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserRequestData;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,11 +23,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class FirebaseDBHandler {
 
@@ -34,6 +33,7 @@ public class FirebaseDBHandler {
     private DatabaseReference reference;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private static final String TAG = "firebaseDBHandler";
+    private ValueEventListener listener;
 
     public FirebaseDBHandler(){
         database = FirebaseDatabase.getInstance();
@@ -44,12 +44,16 @@ public class FirebaseDBHandler {
         reference.child("users").child("public_data").child(user.getUid()).setValue(publicData);
     }
 
-    public void setUserPrivateData(UserPrivateData privateData, String room_id){
-        reference.child("users").child("private_data").child(user.getUid()).child("contacts").child(room_id).setValue(privateData);
+    public void pushUserPrivateData(String room_id, String contact){
+        Map<String, String> newContact = new HashMap<>();
+        newContact.put(contact, room_id);
+        reference.child("users").child("private_data").child(user.getUid()).child("contacts").push().setValue(newContact);
     }
 
-    public void setUserRequestData(UserRequestData requestData, String uid, String room_id){
-        reference.child("users").child("request_data").child(uid).child("message_request").child(room_id).setValue(requestData);
+    public void pushUserRequestData(String uid, String room_id){
+        Map<String, String> request = new HashMap<>();
+        request.put(user.getUid(), room_id);
+        reference.child("users").child("request_data").child(uid).child("message_request").push().setValue(request);
     }
 
     public void updatePublicUserData(UserPublicData publicData){
@@ -57,24 +61,6 @@ public class FirebaseDBHandler {
 
         Map<String, Object> update = new HashMap<>();
         update.put("users/public_data/" + user.getUid(), publicDataValues);
-
-        reference.updateChildren(update);
-    }
-
-    public void updatePrivateUserData(UserPrivateData privateData, String room_id){
-        Map<String, Object> privateDataValues = privateData.toMap();
-
-        Map<String, Object> update = new HashMap<>();
-        update.put("users/private_data/" + user.getUid() + "/contacts/" + room_id, privateDataValues);
-
-        reference.updateChildren(update);
-    }
-
-    public void updateRequestUserData(UserRequestData requestData, String uid, String room_id){
-        Map<String, Object> requestDataValues = requestData.toMap();
-
-        Map<String, Object> update = new HashMap<>();
-        update.put("users/request_data/" + uid + "/message_request/" + room_id, requestDataValues);
 
         reference.updateChildren(update);
     }
@@ -94,50 +80,79 @@ public class FirebaseDBHandler {
         });
     }
 
-    public void retrieveAllUsers(final ContactsFragment requester){
-        reference.child("users").child("public_data")
-                .addValueEventListener(new ValueEventListener() {
+    public void retrieveRequestUserData(){
+
+    }
+
+    public ValueEventListener gatherAllContactData(Activity main){
+        ValueEventListener eventListener = contactListener(main);
+        reference.child("users").child("public_data").addValueEventListener(eventListener);
+        return eventListener;
+    }
+
+    private ValueEventListener contactListener(final Activity main) {
+        listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                 Iterable<DataSnapshot> userData = dataSnapshot.getChildren();
                 List<UserPublicData> publicData = new ArrayList<>();
 
-                for(DataSnapshot data : userData){
-                    UserPublicData retrievedData = data.getValue(UserPublicData.class);
-                    publicData.add(retrievedData);
+                for (DataSnapshot data : userData) {
+                    UserPublicData retrieveData = data.getValue(UserPublicData.class);
+                    publicData.add(retrieveData);
                 }
 
-                if(publicData.size() == 1){
-                    requester.newUserAvaliable(publicData.get(0));
+                if (main instanceof HomeActivity) {
+                    HomeActivity temp = (HomeActivity) main;
+                    temp.fillUsers(publicData);
                 }
-                else{
-                    requester.newUserAvaliable(publicData);
-                }
-
-                retrieveAllUserContacts(requester);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, databaseError.getMessage() + "-retrieveAllUsers");
+                Log.d(TAG, databaseError.getMessage() + "-contactListener");
+            }
+        };
+
+        return listener;
+    }
+
+    public void retrieveUserPrivateData(final Activity main){
+        reference.child("users").child("private_data").child(user.getUid()).child("contacts")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                UserPrivateData privateData = new UserPrivateData();
+                privateData.setContacts(new HashMap<String, String>());
+                for (DataSnapshot data : dataSnapshot.getChildren()){
+                    Map<String, String> temp = (Map<String, String>)data.getValue();
+                    privateData.getContacts().putAll(temp);
+                }
+
+
+                if(main instanceof HomeActivity){
+                    ((HomeActivity) main).setUserPrivateData(privateData);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, databaseError.getMessage() + "-contactListener");
             }
         });
     }
 
-    public void retrieveAllUserContacts(final ContactsFragment requester){
-        reference.child("users").child("private_data").child(user.getUid())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+    public void createNewRoom(RoomMemberData roomData){
+        reference.child("room_members").child(roomData.getRoomName()).setValue(roomData.getRoom())
+                .addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserPrivateData privateData = dataSnapshot.getValue(UserPrivateData.class);
-                requester.userPrivateDate(privateData);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, databaseError.getMessage() + "-retrieveAllUserContacts");
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "-createNewRoom-" + e.getMessage());
             }
         });
+    }
+
+    public void publicDataRemoveListeners(ValueEventListener listener){
+        reference.child("users").child("public_data").removeEventListener(listener);
     }
 }

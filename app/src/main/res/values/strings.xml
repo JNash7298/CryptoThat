@@ -36,7 +36,10 @@
     <string name="reLoginPopup_LoginButton">Login</string>
     <string name="changeUsernamePopup_Hint">Starfish123</string>
     <string name="changeUsernamePopup_LabelText">New Username:</string>
-    <string name="contactsFragment_SearchBarHint">Search for User</string>
+    <string name="contactsFragment_UserSearchBarHint">Search for User</string>
+    <string name="contactsFragment_ContactSearchBarHint">Search for Contact</string>
     <string name="contactsFragment_SearchImageDescription">Search</string>
+    <string name="contactFragment_UserSwitchButton">Users</string>
+    <string name="contactFragment_ContactSwitchButton">Contacts</string>
     <string name="contactData_Avatar">Avatar</string>
 </resources>
