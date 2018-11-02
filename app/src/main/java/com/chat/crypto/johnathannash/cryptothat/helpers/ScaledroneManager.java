@@ -6,8 +6,6 @@ import android.util.Log;
 import android.widget.ListView;
 
 import com.chat.crypto.johnathannash.cryptothat.adapters.MessageAdapter;
-import com.chat.crypto.johnathannash.cryptothat.models.MemberDataModel;
-import com.chat.crypto.johnathannash.cryptothat.models.MessageModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

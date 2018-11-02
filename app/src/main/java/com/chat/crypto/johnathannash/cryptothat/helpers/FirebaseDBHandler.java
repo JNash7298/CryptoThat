@@ -3,6 +3,7 @@ package com.chat.crypto.johnathannash.cryptothat.helpers;
 import android.app.Activity;
 import android.app.Fragment;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.chat.crypto.johnathannash.cryptothat.activities.HomeActivity;
@@ -16,6 +17,7 @@ import com.chat.crypto.johnathannash.cryptothat.models.UserRequestData;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,7 +35,6 @@ public class FirebaseDBHandler {
     private DatabaseReference reference;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private static final String TAG = "firebaseDBHandler";
-    private ValueEventListener listener;
 
     public FirebaseDBHandler(){
         database = FirebaseDatabase.getInstance();
@@ -80,10 +81,6 @@ public class FirebaseDBHandler {
         });
     }
 
-    public void retrieveRequestUserData(){
-
-    }
-
     public ValueEventListener gatherAllContactData(Activity main){
         ValueEventListener eventListener = contactListener(main);
         reference.child("users").child("public_data").addValueEventListener(eventListener);
@@ -91,7 +88,7 @@ public class FirebaseDBHandler {
     }
 
     private ValueEventListener contactListener(final Activity main) {
-        listener = new ValueEventListener() {
+        ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> userData = dataSnapshot.getChildren();
@@ -154,5 +151,80 @@ public class FirebaseDBHandler {
 
     public void publicDataRemoveListeners(ValueEventListener listener){
         reference.child("users").child("public_data").removeEventListener(listener);
+    }
+
+    public void requestDataRemoveListeners(ValueEventListener listener){
+        reference.child("users").child("request_data").child(user.getUid()).child("message_request").removeEventListener(listener);
+    }
+
+    public ValueEventListener gatherRequestData(Activity main) {
+        ValueEventListener listener = requestEventListener(main);
+        reference.child("users").child("request_data").child(user.getUid()).child("message_request")
+                .addValueEventListener(listener);
+        return listener;
+    }
+
+    public void removeRequestData(String requestId){
+        reference.child("users").child("request_data").child(user.getUid()).child("message_request").child(requestId).removeValue();
+    }
+
+    private ValueEventListener requestEventListener(final Activity main){
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                UserRequestData requestData = new UserRequestData();
+                requestData.setMessage_request(new HashMap<String, String>());
+                for (DataSnapshot data : dataSnapshot.getChildren()){
+                    requestData.getMessage_request().put(data.getKey(), (String)data.getValue());
+                }
+
+                if(main instanceof HomeActivity){
+                    ((HomeActivity) main).updateRequestData(requestData);
+                    ((HomeActivity) main).setContentData();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, databaseError.getMessage() + "-requestEventListener");
+            }
+        };
+        return listener;
+    }
+
+    public ChildEventListener connectToMessageRoom(Activity main, String room_id){
+        ChildEventListener listener = messagesListener(main);
+        reference.child("messages").child("room_id").addChildEventListener(listener);
+        return listener;
+    }
+
+    private ChildEventListener messagesListener(final Activity main){
+        ChildEventListener listener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, databaseError.getMessage() + "-messageListener");
+            }
+        };
+        return listener;
     }
 }

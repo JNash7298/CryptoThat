@@ -42,4 +42,5 @@
     <string name="contactFragment_UserSwitchButton">Users</string>
     <string name="contactFragment_ContactSwitchButton">Contacts</string>
     <string name="contactData_Avatar">Avatar</string>
+    <string name="messageRow_AvatarDescription">avatar</string>
 </resources>

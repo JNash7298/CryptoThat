@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,7 +21,6 @@ import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserRequestData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -36,11 +34,13 @@ public class HomeActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FragmentTransaction transaction;
     private Fragment currentListFragment = null;
-    private ValueEventListener listener;
+    private ValueEventListener publicDataListener, requestDataListener;
     private Map<String, UserPublicData> allUsers;
     private UserPrivateData privateData;
     private ContactFragmentListAdapter listAdapter;
     private FirebaseDBHandler dbHandler;
+    private UserRequestData requestData;
+    private boolean Initalizing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +71,34 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setup(){
         allUsers = new HashMap<>();
-        listener = dbHandler.gatherAllContactData(this);
+        requestDataListener = dbHandler.gatherRequestData(this);
+    }
+
+    public void updateRequestData(UserRequestData requestData){
+        if(this.requestData == null){
+            this.requestData = requestData;
+        }
+        else{
+            for(String id : requestData.getMessage_request().keySet()){
+                if(!privateData.getContacts().containsKey(id)){
+                    this.requestData.getMessage_request().put(id, requestData.getMessage_request().get(id));
+                }
+            }
+        }
+
+        while(requestData.getMessage_request().size() != 0){
+            String id = (String)requestData.getMessage_request().keySet().toArray()[0];
+            dbHandler.pushUserPrivateData(requestData.getMessage_request().get(id), id);
+            dbHandler.removeRequestData(id);
+            requestData.getMessage_request().remove(id);
+        }
+    }
+
+    public void setContentData(){
+        if(Initalizing){
+            publicDataListener = dbHandler.gatherAllContactData(this);
+            Initalizing = false;
+        }
     }
 
     public void fillUsers(List<UserPublicData> publicData){
@@ -207,7 +234,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void startMessage(UserPublicData user, UserPublicData contact, String room){
+        Intent intent = new Intent(this, MessageActivity.class);
 
+        intent.putExtra("user_data", user);
+        intent.putExtra("contact_data", contact);
+        intent.putExtra("room", room);
+
+        startActivity(intent);
     }
 
     private void buttonPressEvent(View view){
@@ -231,6 +264,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        dbHandler.publicDataRemoveListeners(listener);
+        dbHandler.publicDataRemoveListeners(publicDataListener);
+        dbHandler.requestDataRemoveListeners(requestDataListener);
     }
 }
