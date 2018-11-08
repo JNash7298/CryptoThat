@@ -1,14 +1,18 @@
 package com.chat.crypto.johnathannash.cryptothat.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.ServerValue;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @IgnoreExtraProperties
-public class MessageData {
+public class MessageData implements Serializable{
 
     String sender, cipher_text, plain_text, cipher_id, key;
     Object timestamp;

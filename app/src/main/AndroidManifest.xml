@@ -29,7 +29,10 @@
         <activity android:name=".activities.RegisterActivity" />
         <activity android:name=".activities.ForgotPasswordActivity" />
         <activity android:name=".activities.MessageActivity" />
-        <activity android:name=".activities.ProfileSetupActivity"></activity>
+        <activity android:name=".activities.ProfileSetupActivity" />
+        <activity android:name=".activities.EncipherMessageActivity" />
+        <activity android:name=".activities.DecipherMessageActivity" />
+        <activity android:name=".activities.NewCustomCipher"></activity>
     </application>
 
 </manifest>

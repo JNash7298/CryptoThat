@@ -7,9 +7,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.chat.crypto.johnathannash.cryptothat.activities.HomeActivity;
+import com.chat.crypto.johnathannash.cryptothat.activities.MessageActivity;
 import com.chat.crypto.johnathannash.cryptothat.activities.ProfileSetupActivity;
 import com.chat.crypto.johnathannash.cryptothat.fragments.ContactsFragment;
 import com.chat.crypto.johnathannash.cryptothat.fragments.FindContactsFragment;
+import com.chat.crypto.johnathannash.cryptothat.models.MessageData;
 import com.chat.crypto.johnathannash.cryptothat.models.RoomMemberData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPrivateData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
@@ -192,9 +194,17 @@ public class FirebaseDBHandler {
         return listener;
     }
 
+    public void removeMessageListener(String room_id, ChildEventListener listener){
+        reference.child("messages").child(room_id).removeEventListener(listener);
+    }
+
+    public void pushMessageDataToMessage(String room_id, MessageData messageData){
+        reference.child("messages").child(room_id).push().setValue(messageData);
+    }
+
     public ChildEventListener connectToMessageRoom(Activity main, String room_id){
         ChildEventListener listener = messagesListener(main);
-        reference.child("messages").child("room_id").addChildEventListener(listener);
+        reference.child("messages").child(room_id).addChildEventListener(listener);
         return listener;
     }
 
@@ -202,12 +212,14 @@ public class FirebaseDBHandler {
         ChildEventListener listener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                MessageData tempData = dataSnapshot.getValue(MessageData.class);
+                if(main instanceof MessageActivity){
+                    ((MessageActivity) main).newMessage(tempData);
+                }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
             }
 
             @Override

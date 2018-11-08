@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.view.menu.MenuView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter {
 
-    private List<MessageData> messages = new ArrayList<>();
+    private List<MessageData> messages;
     private MessageActivity messageActivity;
     private UserPublicData user, contact;
 
@@ -48,11 +49,21 @@ public class MessageAdapter extends RecyclerView.Adapter {
         this.messages = messages;
     }
 
+    public void addToBottom(MessageData messageData){
+        messages.add(messageData);
+        notifyItemInserted(messages.size() - 1);
+
+        int position = messageActivity.getManager().findLastCompletelyVisibleItemPosition();
+        if(getItemCount() - 2 == position || position == -1){
+            messageActivity.getManager().scrollToPosition(getItemCount() - 1);
+        }
+    }
+
     @Override
     public int getItemViewType(int position){
         int type = -1;
 
-        if(messages.get(position).getSender() == user.getUid()){
+        if(messages.get(position).getSender().equals(user.getUid())){
             type = 0;
         }
         else {

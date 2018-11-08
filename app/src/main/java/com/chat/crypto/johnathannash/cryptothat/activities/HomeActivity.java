@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -41,14 +42,15 @@ public class HomeActivity extends AppCompatActivity {
     private FirebaseDBHandler dbHandler;
     private UserRequestData requestData;
     private boolean Initalizing = true;
+    private static final String TAG = "Home";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        user = getIntent().getParcelableExtra("user");
         auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
         dbHandler = new FirebaseDBHandler();
 
         setupEvents();
@@ -177,7 +179,6 @@ public class HomeActivity extends AppCompatActivity {
 
     public List<UserPublicData> contactsList(){
         List<UserPublicData> contacts = new ArrayList<>();
-
         for (String id : privateData.getContacts().keySet()) {
             contacts.add(allUsers.get(id));
         }

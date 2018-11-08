@@ -43,4 +43,31 @@
     <string name="contactFragment_ContactSwitchButton">Contacts</string>
     <string name="contactData_Avatar">Avatar</string>
     <string name="messageRow_AvatarDescription">avatar</string>
+    <string name="message_ConstructMessageButton">Create Message</string>
+    <string name="message_BackToHomeButton">Home</string>
+    <string name="encipherMessage_CipherNameLabel">Cipher:</string>
+    <string name="encipherMessage_KeyLabel">Key:</string>
+    <string-array name="temp_values">
+        <item>test</item>
+        <item>temp</item>
+        <item>tiitemmkslcnwlanldvlekmfmsmcvkamefmmlflsdkmcsmffee</item>
+    </string-array>
+    <string name="encipher_CipherTextHint">Cipher Text</string>
+    <string name="encipher_PlainTextHint">Plain Text</string>
+    <string name="selectOne">(Select One)</string>
+    <string name="encipherKey_Error">Not a Valid Key</string>
+    <string name="encipherMessage_KeyInputHint">Key</string>
+    <string name="encipherMessage_TopTextWrapperEmptyKey">You need a valid key to enter message.</string>
+    <string name="encipherMessage_TopTextWrapperInvalidKey">Your key is invalid read the cipher description to get the proper format for the key.</string>
+    <string name="encipherMessage_BackButton">Back</string>
+    <string name="encipherMessage_SendButton">Send</string>
+    <string name="decipherMessage_BackButton">Back</string>
+    <string name="decipherMessage_KeyInputHint">Key</string>
+    <string name="decipherMessage_KeyError">Not a Valid Key</string>
+    <string name="decipherMessage_TopTextWrapperEmptyKey">You need a valid key to enter cipher text.</string>
+    <string name="decipherMessage_TopTextWrapperInvalidKey">Your key is invalid read the cipher description to get the proper format for the key.</string>
+    <string name="decipherMessage_CipherTextHint">Cipher Text</string>
+    <string name="decipherMessage_PlainTextHint">Plain Text</string>
+    <string name="decipherMessage_CipherNameLabel">Cipher:</string>
+    <string name="decipherMessage_KeyLabel">Key:</string>
 </resources>

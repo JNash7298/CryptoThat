@@ -15,4 +15,6 @@
     <color name="profileSetup_NameColor">#000000</color>
     <color name="profileSetup_EmailColor">#000000</color>
     <color name="temp_profileColor">#da70d6</color>
+    <color name="transparentBackground">#00000000</color>
+    <color name="errorColor">#e53935</color>
 </resources>
