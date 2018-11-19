@@ -13,6 +13,7 @@ import java.util.Map;
 public class UserRequestData implements Parcelable {
 
     @Exclude
+    String key;
     Map<String, String> message_request;
 
     public UserRequestData(){
@@ -27,9 +28,18 @@ public class UserRequestData implements Parcelable {
         this.message_request = message_request;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     @Exclude
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
+        result.put("key", key);
         result.put("message_request", message_request);
 
         return result;

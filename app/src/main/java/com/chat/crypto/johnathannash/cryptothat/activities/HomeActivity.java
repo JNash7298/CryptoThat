@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,8 +25,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -40,8 +41,8 @@ public class HomeActivity extends AppCompatActivity {
     private UserPrivateData privateData;
     private ContactFragmentListAdapter listAdapter;
     private FirebaseDBHandler dbHandler;
-    private UserRequestData requestData;
-    private boolean Initalizing = true;
+    private Queue<UserRequestData> requestDataQueue;
+    private boolean initializing = true;
     private static final String TAG = "Home";
 
     @Override
@@ -55,6 +56,10 @@ public class HomeActivity extends AppCompatActivity {
 
         setupEvents();
         setup();
+    }
+
+    public boolean getInitializing(){
+        return initializing;
     }
 
     private void setupEvents(){
@@ -73,34 +78,27 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setup(){
         allUsers = new HashMap<>();
+        requestDataQueue = new LinkedList<>();
         requestDataListener = dbHandler.gatherRequestData(this);
     }
 
     public void updateRequestData(UserRequestData requestData){
-        if(this.requestData == null){
-            this.requestData = requestData;
-        }
-        else{
-            for(String id : requestData.getMessage_request().keySet()){
-                if(!privateData.getContacts().containsKey(id)){
-                    this.requestData.getMessage_request().put(id, requestData.getMessage_request().get(id));
-                }
+        if(privateData != null){
+            UserRequestData request = requestData;
+            String contact = (String)request.getMessage_request().keySet().toArray()[0];
+            privateData.getContacts().putAll(request.getMessage_request());
+            dbHandler.pushUserPrivateData(request.getMessage_request().get(contact), contact);
+            if(currentListFragment instanceof ContactsFragment){
+                ((ContactsFragment) currentListFragment).updateDisplay();
             }
-        }
-
-        while(requestData.getMessage_request().size() != 0){
-            String id = (String)requestData.getMessage_request().keySet().toArray()[0];
-            dbHandler.pushUserPrivateData(requestData.getMessage_request().get(id), id);
-            dbHandler.removeRequestData(id);
-            requestData.getMessage_request().remove(id);
+        }else{
+            requestDataQueue.add(requestData);
         }
     }
 
     public void setContentData(){
-        if(Initalizing){
-            publicDataListener = dbHandler.gatherAllContactData(this);
-            Initalizing = false;
-        }
+        publicDataListener = dbHandler.gatherAllContactData(this);
+        initializing = false;
     }
 
     public void fillUsers(List<UserPublicData> publicData){
@@ -128,6 +126,12 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setUserPrivateData(UserPrivateData privateData){
         this.privateData = privateData;
+        while(requestDataQueue.size() != 0){
+            UserRequestData request = requestDataQueue.remove();
+            String contact = (String)request.getMessage_request().keySet().toArray()[0];
+            privateData.getContacts().putAll(request.getMessage_request());
+            dbHandler.pushUserPrivateData(request.getMessage_request().get(contact), contact);
+        }
         switchContactList(allUsers, privateData);
     }
 
@@ -179,8 +183,9 @@ public class HomeActivity extends AppCompatActivity {
 
     public List<UserPublicData> contactsList(){
         List<UserPublicData> contacts = new ArrayList<>();
-        for (String id : privateData.getContacts().keySet()) {
-            contacts.add(allUsers.get(id));
+
+        for(int index = 0; index < privateData.getContacts().size(); index++){
+            contacts.add(allUsers.get(privateData.getContacts().keySet().toArray()[index]));
         }
 
         return contacts;
@@ -226,10 +231,12 @@ public class HomeActivity extends AppCompatActivity {
                 message_request.put(user.getUid(), newRoom.getRoomName());
                 request.setMessage_request(message_request);
 
-                dbHandler.pushUserRequestData(publicData.getUid(), newRoom.getRoomName());
+                dbHandler.pushUserRequestData(publicData.getUid(), request);
 
                 privateData.getContacts().put(publicData.getUid(), newRoom.getRoomName());
                 dbHandler.pushUserPrivateData(newRoom.getRoomName(), publicData.getUid());
+
+                startMessage(allUsers.get(user.getUid()), publicData, newRoom.getRoomName());
             }
         }
     }
@@ -265,7 +272,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        dbHandler.publicDataRemoveListeners(publicDataListener);
-        dbHandler.requestDataRemoveListeners(requestDataListener);
+        if(publicDataListener != null){
+            dbHandler.publicDataRemoveListeners(publicDataListener);
+        }
+        if(requestDataListener != null){
+            dbHandler.requestDataRemoveListeners(requestDataListener);
+        }
     }
 }

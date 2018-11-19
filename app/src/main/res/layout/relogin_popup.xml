@@ -22,7 +22,7 @@
 
         <EditText
             android:id="@+id/reloginPopup_Email"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="1"
@@ -40,7 +40,7 @@
 
         <EditText
             android:id="@+id/reloginPopup_Password"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="1"
@@ -63,9 +63,9 @@
     <Button
         android:id="@+id/reloginPopup_LoginButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="42dp"
         android:layout_gravity="center"
         android:layout_margin="10dp"
-        android:text="@string/reLoginPopup_LoginButton" />
+        android:text="@string/reLoginPopup_LoginButton"/>
 
 </LinearLayout>

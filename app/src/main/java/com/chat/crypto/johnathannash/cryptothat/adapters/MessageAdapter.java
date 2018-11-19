@@ -49,14 +49,9 @@ public class MessageAdapter extends RecyclerView.Adapter {
         this.messages = messages;
     }
 
-    public void addToBottom(MessageData messageData){
-        messages.add(messageData);
-        notifyItemInserted(messages.size() - 1);
-
-        int position = messageActivity.getManager().findLastCompletelyVisibleItemPosition();
-        if(getItemCount() - 2 == position || position == -1){
-            messageActivity.getManager().scrollToPosition(getItemCount() - 1);
-        }
+    public void addToBottom(List<MessageData> messageData){
+        messages = messageData;
+        notifyDataSetChanged();
     }
 
     @Override

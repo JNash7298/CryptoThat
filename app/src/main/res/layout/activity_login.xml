@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
-                android:text="@string/login_LoginButtonText" />
+                android:text="@string/login_LoginButtonText"/>
 
             <TextView
                 android:id="@+id/login_ForgotPassword"
@@ -107,7 +107,7 @@
             <Button
                 android:id="@+id/login_RegisterButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="42dp"
                 android:text="@string/login_RegisterButtonText"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

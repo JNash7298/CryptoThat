@@ -4,9 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.chat.crypto.johnathannash.cryptothat.R;
@@ -27,7 +30,7 @@ public class FindContactsFragment extends Fragment {
 
     private FirebaseDBHandler dbHandler;
     private RecyclerView list;
-    private TextView searchBar;
+    private EditText searchBar;
     private View view;
     private HomeActivity home;
     private Map<String, UserPublicData> allUsers;
@@ -77,15 +80,51 @@ public class FindContactsFragment extends Fragment {
     private void setupEvents(){
         searchBar = view.findViewById(R.id.contactsFragment_SearchBar);
 
-        view.findViewById(R.id.contactsFragment_ContactSwitchButton)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onClickEvent(v);
-                    }
-                });
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-        view.findViewById(R.id.contactFragment_SearchButton)
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                List<UserPublicData> listData = new ArrayList<>();
+
+                if(s.toString().isEmpty()){
+                    listData.addAll(allUsers.values());
+                    listData.remove(allUsers.get(user.getUid()));
+                }
+                else{
+                    for(String id : allUsers.keySet()){
+                        if(!id.equals(user.getUid())){
+                            UserPublicData tempData = allUsers.get(id);
+                            if(tempData.getName().toLowerCase().contains(s.toString())){
+                                listData.add(tempData);
+                            }
+                        }
+                    }
+                }
+
+                listAdapter.DisplayOnly(listData);
+            }
+        });
+
+        searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!searchBar.getText().toString().isEmpty() || hasFocus){
+                    searchBar.setCompoundDrawables(null, null, null, null);
+                }
+                else{
+                    searchBar.setCompoundDrawables(getResources().getDrawable(R.drawable.icons8_search, null), null, null, null);
+                }
+            }
+        });
+
+        view.findViewById(R.id.contactsFragment_ContactSwitchButton)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -98,26 +137,6 @@ public class FindContactsFragment extends Fragment {
         switch (view.getId()){
             case R.id.contactsFragment_ContactSwitchButton:
                 home.switchContactList(allUsers, privateData);
-                break;
-            case R.id.contactFragment_SearchButton:
-                List<UserPublicData> listData = new ArrayList<>();
-
-                if(searchBar.getText() == null || searchBar.getText().toString().isEmpty()){
-                    listData.addAll(allUsers.values());
-                    listData.remove(allUsers.get(user.getUid()));
-                }
-                else{
-                    for(String id : allUsers.keySet()){
-                        if(!id.equals(user.getUid())){
-                            UserPublicData tempData = allUsers.get(id);
-                            if(tempData.getName().toLowerCase().contains(searchBar.getText().toString())){
-                                listData.add(tempData);
-                            }
-                        }
-                    }
-                }
-
-                listAdapter.DisplayOnly(listData);
                 break;
         }
     }

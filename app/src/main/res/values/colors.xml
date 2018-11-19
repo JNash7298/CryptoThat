@@ -17,4 +17,7 @@
     <color name="temp_profileColor">#da70d6</color>
     <color name="transparentBackground">#00000000</color>
     <color name="errorColor">#e53935</color>
+    <color name="backgroundColor">#f0ffff</color>
+    <color name="selectColor">#64c8c8</color>
+    <color name="accentColor">#da70d6</color>
 </resources>

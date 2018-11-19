@@ -7,8 +7,6 @@
     android:orientation="vertical"
     tools:context=".fragments.ContactsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,12 +15,12 @@
         <Button
             android:id="@+id/contactsFragment_UserSwitchButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="42dp"
             android:layout_gravity="center_vertical|start"
             android:layout_marginBottom="10dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
-            android:text="@string/contactFragment_UserSwitchButton" />
+            android:text="@string/contactFragment_UserSwitchButton"/>
 
         <EditText
             android:id="@+id/contactsFragment_SearchBar"
@@ -30,27 +28,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
-            android:layout_marginEnd="5dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_weight="3"
+            android:drawableStart="@drawable/icons8_search"
             android:ems="10"
             android:hint="@string/contactsFragment_ContactSearchBarHint"
             android:inputType="textPersonName" />
 
-        <ImageButton
-            android:id="@+id/contactFragment_SearchButton"
-            style="@style/Base.Widget.AppCompat.Button.Borderless"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_vertical|end"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            android:contentDescription="@string/contactsFragment_SearchImageDescription"
-            android:scaleType="fitCenter"
-            android:src="@android:drawable/ic_search_category_default" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

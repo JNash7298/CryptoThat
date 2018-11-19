@@ -32,7 +32,7 @@
     <Button
         android:id="@+id/changeEmailPopup_SubmitButton"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="42dp"
         android:layout_gravity="center_horizontal"
-        android:text="@string/changeEmailPopup_SubmitButton" />
+        android:text="@string/changeEmailPopup_SubmitButton"/>
 </LinearLayout>

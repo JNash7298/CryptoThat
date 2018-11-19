@@ -14,6 +14,7 @@ import com.chat.crypto.johnathannash.cryptothat.helpers.FirebaseDBHandler;
 import com.chat.crypto.johnathannash.cryptothat.models.MessageData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
 import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class MessageActivity extends AppCompatActivity{
     private FirebaseDBHandler dbHandler;
     private RecyclerView messageList;
     private MessageAdapter messageAdapter;
-    private ChildEventListener roomListener;
+    private ValueEventListener roomListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,7 @@ public class MessageActivity extends AppCompatActivity{
         dbHandler.pushMessageDataToMessage(room, messageData);
     }
 
-    public void newMessage(MessageData messageData){
+    public void newMessage(List<MessageData> messageData){
         messageAdapter.addToBottom(messageData);
     }
 

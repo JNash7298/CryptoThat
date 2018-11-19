@@ -1,7 +1,6 @@
 package com.chat.crypto.johnathannash.cryptothat.helpers;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -9,8 +8,6 @@ import android.util.Log;
 import com.chat.crypto.johnathannash.cryptothat.activities.HomeActivity;
 import com.chat.crypto.johnathannash.cryptothat.activities.MessageActivity;
 import com.chat.crypto.johnathannash.cryptothat.activities.ProfileSetupActivity;
-import com.chat.crypto.johnathannash.cryptothat.fragments.ContactsFragment;
-import com.chat.crypto.johnathannash.cryptothat.fragments.FindContactsFragment;
 import com.chat.crypto.johnathannash.cryptothat.models.MessageData;
 import com.chat.crypto.johnathannash.cryptothat.models.RoomMemberData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPrivateData;
@@ -47,18 +44,6 @@ public class FirebaseDBHandler {
         reference.child("users").child("public_data").child(user.getUid()).setValue(publicData);
     }
 
-    public void pushUserPrivateData(String room_id, String contact){
-        Map<String, String> newContact = new HashMap<>();
-        newContact.put(contact, room_id);
-        reference.child("users").child("private_data").child(user.getUid()).child("contacts").push().setValue(newContact);
-    }
-
-    public void pushUserRequestData(String uid, String room_id){
-        Map<String, String> request = new HashMap<>();
-        request.put(user.getUid(), room_id);
-        reference.child("users").child("request_data").child(uid).child("message_request").push().setValue(request);
-    }
-
     public void updatePublicUserData(UserPublicData publicData){
         Map<String, Object> publicDataValues = publicData.toMap();
 
@@ -69,6 +54,7 @@ public class FirebaseDBHandler {
     }
 
     public void retrievePublicUserData(final ProfileSetupActivity requester){
+
         reference.child("users").child("public_data").child(user.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -79,6 +65,145 @@ public class FirebaseDBHandler {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, databaseError.getMessage() + "-retrievePublicUserData");
+            }
+        });
+    }
+
+    public void publicDataRemoveListeners(ValueEventListener listener){
+        reference.child("users").child("public_data").removeEventListener(listener);
+    }
+
+    public void pushUserRequestData(String uid, UserRequestData requestData){
+        String key = reference.child("users").child("request_data").child(uid).push().getKey();
+        requestData.setKey(key);
+        reference.child("users").child("request_data").child(uid).child(requestData.getKey()).updateChildren(requestData.toMap())
+                .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, e.getMessage() + "-pushUserRequestData");
+            }
+        });
+    }
+
+    public void requestDataRemoveListeners(ValueEventListener listener){
+        reference.child("users").child("request_data").child(user.getUid())
+                .removeEventListener(listener);
+    }
+
+    public ValueEventListener gatherRequestData(Activity main) {
+        ValueEventListener listener = requestEventListener(main);
+        reference.child("users").child("request_data").child(user.getUid())
+                .addValueEventListener(listener);
+        return listener;
+    }
+
+    public void removeRequestData(String requestId){
+        reference.child("users").child("request_data").child(user.getUid()).child(requestId).removeValue();
+    }
+
+    private ValueEventListener requestEventListener(final Activity main){
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<UserRequestData> requests = new ArrayList<>();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    requests.add(data.getValue(UserRequestData.class));
+                }
+
+                if(main instanceof HomeActivity){
+                    for (UserRequestData request: requests) {
+                        ((HomeActivity) main).updateRequestData(request);
+                        if(request.getKey() != null){
+                            FirebaseDBHandler.this.removeRequestData(request.getKey());
+                        }
+                    }
+                    if(((HomeActivity) main).getInitializing()){
+                        ((HomeActivity) main).setContentData();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, databaseError.getMessage() + "-requestEventListener");
+            }
+        };
+        return listener;
+    }
+
+    public void pushUserPrivateData(String room_id, String contact){
+        Map<String, String> newContact = new HashMap<>();
+        newContact.put(contact, room_id);
+        reference.child("users").child("private_data").child(user.getUid()).child("contacts").push().setValue(newContact);
+    }
+
+    public void retrieveUserPrivateData(final Activity main){
+        reference.child("users").child("private_data").child(user.getUid()).child("contacts")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                UserPrivateData privateData = new UserPrivateData();
+                privateData.setContacts(new HashMap<String, String>());
+                for (DataSnapshot data : dataSnapshot.getChildren()){
+                    Map<String, String> temp = (Map<String, String>)data.getValue();
+                    privateData.getContacts().putAll(temp);
+                }
+
+
+                if(main instanceof HomeActivity){
+                    ((HomeActivity) main).setUserPrivateData(privateData);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, databaseError.getMessage() + "-contactListener");
+            }
+        });
+    }
+
+    public void removeMessageListener(String room_id, ValueEventListener listener){
+        reference.child("messages").child(room_id).removeEventListener(listener);
+    }
+
+    public void pushMessageDataToMessage(String room_id, MessageData messageData){
+        reference.child("messages").child(room_id).push().setValue(messageData);
+    }
+
+    public ValueEventListener connectToMessageRoom(Activity main, String room_id){
+        ValueEventListener listener = messagesListener(main);
+        reference.child("messages").child(room_id).orderByChild("timestamp").addValueEventListener(listener);
+        return listener;
+    }
+
+    private ValueEventListener messagesListener(final Activity main){
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<MessageData> dataList = new ArrayList<>();
+                for (DataSnapshot data: dataSnapshot.getChildren()) {
+                    dataList.add(data.getValue(MessageData.class));
+                }
+
+                if(main instanceof MessageActivity){
+                    ((MessageActivity) main).newMessage(dataList);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        return listener;
+    }
+
+    public void createNewRoom(RoomMemberData roomData){
+        reference.child("room_members").child(roomData.getRoomName()).setValue(roomData.getRoom())
+                .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "-createNewRoom-" + e.getMessage());
             }
         });
     }
@@ -113,130 +238,6 @@ public class FirebaseDBHandler {
             }
         };
 
-        return listener;
-    }
-
-    public void retrieveUserPrivateData(final Activity main){
-        reference.child("users").child("private_data").child(user.getUid()).child("contacts")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserPrivateData privateData = new UserPrivateData();
-                privateData.setContacts(new HashMap<String, String>());
-                for (DataSnapshot data : dataSnapshot.getChildren()){
-                    Map<String, String> temp = (Map<String, String>)data.getValue();
-                    privateData.getContacts().putAll(temp);
-                }
-
-
-                if(main instanceof HomeActivity){
-                    ((HomeActivity) main).setUserPrivateData(privateData);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, databaseError.getMessage() + "-contactListener");
-            }
-        });
-    }
-
-    public void createNewRoom(RoomMemberData roomData){
-        reference.child("room_members").child(roomData.getRoomName()).setValue(roomData.getRoom())
-                .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "-createNewRoom-" + e.getMessage());
-            }
-        });
-    }
-
-    public void publicDataRemoveListeners(ValueEventListener listener){
-        reference.child("users").child("public_data").removeEventListener(listener);
-    }
-
-    public void requestDataRemoveListeners(ValueEventListener listener){
-        reference.child("users").child("request_data").child(user.getUid()).child("message_request").removeEventListener(listener);
-    }
-
-    public ValueEventListener gatherRequestData(Activity main) {
-        ValueEventListener listener = requestEventListener(main);
-        reference.child("users").child("request_data").child(user.getUid()).child("message_request")
-                .addValueEventListener(listener);
-        return listener;
-    }
-
-    public void removeRequestData(String requestId){
-        reference.child("users").child("request_data").child(user.getUid()).child("message_request").child(requestId).removeValue();
-    }
-
-    private ValueEventListener requestEventListener(final Activity main){
-        ValueEventListener listener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserRequestData requestData = new UserRequestData();
-                requestData.setMessage_request(new HashMap<String, String>());
-                for (DataSnapshot data : dataSnapshot.getChildren()){
-                    requestData.getMessage_request().put(data.getKey(), (String)data.getValue());
-                }
-
-                if(main instanceof HomeActivity){
-                    ((HomeActivity) main).updateRequestData(requestData);
-                    ((HomeActivity) main).setContentData();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, databaseError.getMessage() + "-requestEventListener");
-            }
-        };
-        return listener;
-    }
-
-    public void removeMessageListener(String room_id, ChildEventListener listener){
-        reference.child("messages").child(room_id).removeEventListener(listener);
-    }
-
-    public void pushMessageDataToMessage(String room_id, MessageData messageData){
-        reference.child("messages").child(room_id).push().setValue(messageData);
-    }
-
-    public ChildEventListener connectToMessageRoom(Activity main, String room_id){
-        ChildEventListener listener = messagesListener(main);
-        reference.child("messages").child(room_id).addChildEventListener(listener);
-        return listener;
-    }
-
-    private ChildEventListener messagesListener(final Activity main){
-        ChildEventListener listener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                MessageData tempData = dataSnapshot.getValue(MessageData.class);
-                if(main instanceof MessageActivity){
-                    ((MessageActivity) main).newMessage(tempData);
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, databaseError.getMessage() + "-messageListener");
-            }
-        };
         return listener;
     }
 }

@@ -41,8 +41,8 @@
             <Button
                 android:id="@+id/register_ReturnToLoginButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/register_ReturnToLoginButtonText" />
+                android:layout_height="42dp"
+                android:text="@string/register_ReturnToLoginButtonText"/>
         </LinearLayout>
 
         <LinearLayout
@@ -99,9 +99,9 @@
             <Button
                 android:id="@+id/RegisterButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="42dp"
                 android:layout_marginBottom="10dp"
-                android:text="@string/register_RegisterButtonText" />
+                android:text="@string/register_RegisterButtonText"/>
 
         </LinearLayout>
 
