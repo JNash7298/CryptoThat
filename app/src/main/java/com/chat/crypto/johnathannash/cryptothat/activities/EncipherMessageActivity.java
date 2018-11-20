@@ -18,6 +18,7 @@ import com.chat.crypto.johnathannash.cryptothat.helpers.CipherProgram;
 import com.chat.crypto.johnathannash.cryptothat.models.CipherSpinnerData;
 import com.chat.crypto.johnathannash.cryptothat.models.MessageData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class EncipherMessageActivity extends AppCompatActivity {
 
@@ -27,6 +28,7 @@ public class EncipherMessageActivity extends AppCompatActivity {
     private CipherSpinnerAdapter spinnerAdapter;
     private String room;
     private UserPublicData user, contact;
+    private boolean appStopping = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +131,7 @@ public class EncipherMessageActivity extends AppCompatActivity {
                 intent.putExtra("user_data", user);
                 intent.putExtra("contact_data", contact);
                 intent.putExtra("room", room);
+                appStopping = false;
                 break;
             case R.id.encipherMessage_sendButton:
                 MessageData tempMessage = new MessageData();
@@ -143,6 +146,7 @@ public class EncipherMessageActivity extends AppCompatActivity {
                 intent.putExtra("contact_data", contact);
                 intent.putExtra("room", room);
                 intent.putExtra("sendMessageData", tempMessage);
+                appStopping = false;
                 break;
         }
         if(intent != null){
@@ -170,6 +174,14 @@ public class EncipherMessageActivity extends AppCompatActivity {
             } else{
                 topTextWrapper.setError(getString(R.string.encipherMessage_TopTextWrapperInvalidKey));
             }
+        }
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        if(appStopping){
+            FirebaseAuth.getInstance().signOut();
         }
     }
 }

@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chat.crypto.johnathannash.cryptothat.R;
 import com.chat.crypto.johnathannash.cryptothat.adapters.ContactFragmentListAdapter;
@@ -43,6 +44,7 @@ public class HomeActivity extends AppCompatActivity {
     private FirebaseDBHandler dbHandler;
     private Queue<UserRequestData> requestDataQueue;
     private boolean initializing = true;
+    private boolean appStopping = true;
     private static final String TAG = "Home";
 
     @Override
@@ -255,11 +257,13 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = null;
         switch (view.getId()){
             case R.id.home_CipherButton:
+                Toast.makeText(this, "not Implimented in current version please wait.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.home_SettingButtton:
+                intent = new Intent(this, ProfileSetupActivity.class);
+                appStopping = false;
                 break;
             case R.id.home_LogoutButton:
-                auth.signOut();
                 intent = new Intent(this, LoginActivity.class);
                 break;
         }
@@ -277,6 +281,9 @@ public class HomeActivity extends AppCompatActivity {
         }
         if(requestDataListener != null){
             dbHandler.requestDataRemoveListeners(requestDataListener);
+        }
+        if(appStopping){
+            auth.signOut();
         }
     }
 }

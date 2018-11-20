@@ -13,6 +13,7 @@ import com.chat.crypto.johnathannash.cryptothat.adapters.MessageAdapter;
 import com.chat.crypto.johnathannash.cryptothat.helpers.FirebaseDBHandler;
 import com.chat.crypto.johnathannash.cryptothat.models.MessageData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.ValueEventListener;
 
@@ -27,6 +28,7 @@ public class MessageActivity extends AppCompatActivity{
     private RecyclerView messageList;
     private MessageAdapter messageAdapter;
     private ValueEventListener roomListener;
+    private boolean appStopping = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,14 +99,26 @@ public class MessageActivity extends AppCompatActivity{
                 intent.putExtra("user", userData);
                 intent.putExtra("contact", contactData);
                 intent.putExtra("room", room);
+                appStopping = false;
                 break;
             case R.id.message_BackButton:
                 intent = new Intent(this, HomeActivity.class);
+                appStopping = false;
                 break;
         }
         if(intent != null){
             dbHandler.removeMessageListener(room, roomListener);
             startActivity(intent);
+        }
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(roomListener != null){
+            dbHandler.removeMessageListener(room, roomListener);
+        }
+        if(appStopping){
+            FirebaseAuth.getInstance().signOut();
         }
     }
 }

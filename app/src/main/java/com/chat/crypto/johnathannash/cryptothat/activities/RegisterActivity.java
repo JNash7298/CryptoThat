@@ -223,4 +223,11 @@ public class RegisterActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
 }

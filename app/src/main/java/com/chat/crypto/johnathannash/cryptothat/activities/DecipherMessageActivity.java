@@ -17,6 +17,7 @@ import com.chat.crypto.johnathannash.cryptothat.helpers.CipherProgram;
 import com.chat.crypto.johnathannash.cryptothat.models.CipherSpinnerData;
 import com.chat.crypto.johnathannash.cryptothat.models.MessageData;
 import com.chat.crypto.johnathannash.cryptothat.models.UserPublicData;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class DecipherMessageActivity extends AppCompatActivity {
 
@@ -27,6 +28,7 @@ public class DecipherMessageActivity extends AppCompatActivity {
     private String room;
     private UserPublicData user, contact;
     private MessageData messageData;
+    private boolean appStopping = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +138,7 @@ public class DecipherMessageActivity extends AppCompatActivity {
                 intent.putExtra("user_data", user);
                 intent.putExtra("contact_data", contact);
                 intent.putExtra("room", room);
+                appStopping = false;
                 break;
         }
         if(intent != null){
@@ -163,6 +166,14 @@ public class DecipherMessageActivity extends AppCompatActivity {
             } else{
                 topTextWrapper.setError(getString(R.string.decipherMessage_TopTextWrapperInvalidKey));
             }
+        }
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        if(appStopping){
+            FirebaseAuth.getInstance().signOut();
         }
     }
 }
