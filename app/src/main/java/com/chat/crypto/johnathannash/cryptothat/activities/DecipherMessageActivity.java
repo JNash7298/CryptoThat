@@ -28,7 +28,7 @@ public class DecipherMessageActivity extends AppCompatActivity {
     private String room;
     private UserPublicData user, contact;
     private MessageData messageData;
-    private boolean appStopping = true;
+    private boolean appStopping = true, lockInput = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,18 +131,21 @@ public class DecipherMessageActivity extends AppCompatActivity {
     }
 
     private void onClickEvent(View view){
-        Intent intent = null;
-        switch (view.getId()){
-            case R.id.decipherMessage_backButton:
-                intent = new Intent(this, MessageActivity.class);
-                intent.putExtra("user_data", user);
-                intent.putExtra("contact_data", contact);
-                intent.putExtra("room", room);
-                appStopping = false;
-                break;
-        }
-        if(intent != null){
-            startActivity(intent);
+        if(!lockInput){
+            lockInput = true;
+            Intent intent = null;
+            switch (view.getId()){
+                case R.id.decipherMessage_backButton:
+                    intent = new Intent(this, MessageActivity.class);
+                    intent.putExtra("user_data", user);
+                    intent.putExtra("contact_data", contact);
+                    intent.putExtra("room", room);
+                    appStopping = false;
+                    break;
+            }
+            if(intent != null){
+                startActivity(intent);
+            }
         }
     }
 

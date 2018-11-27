@@ -29,6 +29,7 @@ public class MessageActivity extends AppCompatActivity{
     private MessageAdapter messageAdapter;
     private ValueEventListener roomListener;
     private boolean appStopping = true;
+    private boolean lockInput = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +56,17 @@ public class MessageActivity extends AppCompatActivity{
     }
 
     public void messageSelected(MessageData messageData){
-        Intent intent = new Intent(this, DecipherMessageActivity.class);
-        intent.putExtra("user", userData);
-        intent.putExtra("contact", contactData);
-        intent.putExtra("room", room);
-        intent.putExtra("message_data", messageData);
+        if(!lockInput){
+            lockInput = true;
+            Intent intent = new Intent(this, DecipherMessageActivity.class);
+            intent.putExtra("user", userData);
+            intent.putExtra("contact", contactData);
+            intent.putExtra("room", room);
+            intent.putExtra("message_data", messageData);
+            appStopping = false;
 
-        startActivity(intent);
+            startActivity(intent);
+        }
     }
 
     private void setupEvent(){
@@ -84,31 +89,31 @@ public class MessageActivity extends AppCompatActivity{
 
     public void newMessage(List<MessageData> messageData){
         messageAdapter.addToBottom(messageData);
-    }
-
-    public LinearLayoutManager getManager(){
-        return (LinearLayoutManager) messageList.getLayoutManager();
+        messageList.scrollToPosition(messageData.size() - 1);
     }
 
     private void buttonEvent(View view){
-        Intent intent = null;
-        switch (view.getId()){
-            case R.id.message_MessageButton:
-                intent = new Intent(this, EncipherMessageActivity.class);
+        if(!lockInput) {
+            lockInput = true;
+            Intent intent = null;
+            switch (view.getId()) {
+                case R.id.message_MessageButton:
+                    intent = new Intent(this, EncipherMessageActivity.class);
 
-                intent.putExtra("user", userData);
-                intent.putExtra("contact", contactData);
-                intent.putExtra("room", room);
-                appStopping = false;
-                break;
-            case R.id.message_BackButton:
-                intent = new Intent(this, HomeActivity.class);
-                appStopping = false;
-                break;
-        }
-        if(intent != null){
-            dbHandler.removeMessageListener(room, roomListener);
-            startActivity(intent);
+                    intent.putExtra("user", userData);
+                    intent.putExtra("contact", contactData);
+                    intent.putExtra("room", room);
+                    appStopping = false;
+                    break;
+                case R.id.message_BackButton:
+                    intent = new Intent(this, HomeActivity.class);
+                    appStopping = false;
+                    break;
+            }
+            if (intent != null) {
+                dbHandler.removeMessageListener(room, roomListener);
+                startActivity(intent);
+            }
         }
     }
     @Override

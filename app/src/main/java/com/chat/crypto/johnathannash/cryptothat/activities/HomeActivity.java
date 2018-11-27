@@ -45,6 +45,7 @@ public class HomeActivity extends AppCompatActivity {
     private Queue<UserRequestData> requestDataQueue;
     private boolean initializing = true;
     private boolean appStopping = true;
+    private boolean lockInput = false;
     private static final String TAG = "Home";
 
     @Override
@@ -206,39 +207,42 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void selectedUserToMessage(UserPublicData publicData){
-        String room;
-        if(currentListFragment instanceof ContactsFragment){
-            room = privateData.getContacts().get(publicData.getUid());
-            startMessage(allUsers.get(user.getUid()), publicData, room);
-        }else if (currentListFragment instanceof FindContactsFragment){
-            if(privateData.getContacts().containsKey(publicData.getUid())){
+        if(!lockInput){
+            lockInput = true;
+            String room;
+            if(currentListFragment instanceof ContactsFragment){
                 room = privateData.getContacts().get(publicData.getUid());
                 startMessage(allUsers.get(user.getUid()), publicData, room);
-            }
-            else{
-                RoomMemberData newRoom = new RoomMemberData();
+            }else if (currentListFragment instanceof FindContactsFragment){
+                if(privateData.getContacts().containsKey(publicData.getUid())){
+                    room = privateData.getContacts().get(publicData.getUid());
+                    startMessage(allUsers.get(user.getUid()), publicData, room);
+                }
+                else{
+                    RoomMemberData newRoom = new RoomMemberData();
 
-                Map<String, Boolean> roomMember = new HashMap<>();
-                roomMember.put(user.getUid(), true);
-                roomMember.put(publicData.getUid(), true);
+                    Map<String, Boolean> roomMember = new HashMap<>();
+                    roomMember.put(user.getUid(), true);
+                    roomMember.put(publicData.getUid(), true);
 
-                newRoom.setRoom(roomMember);
-                newRoom.setRoomName(user.getUid() + ":" + publicData.getUid());
+                    newRoom.setRoom(roomMember);
+                    newRoom.setRoomName(user.getUid() + ":" + publicData.getUid());
 
-                dbHandler.createNewRoom(newRoom);
+                    dbHandler.createNewRoom(newRoom);
 
-                UserRequestData request = new UserRequestData();
+                    UserRequestData request = new UserRequestData();
 
-                Map<String, String> message_request = new HashMap<>();
-                message_request.put(user.getUid(), newRoom.getRoomName());
-                request.setMessage_request(message_request);
+                    Map<String, String> message_request = new HashMap<>();
+                    message_request.put(user.getUid(), newRoom.getRoomName());
+                    request.setMessage_request(message_request);
 
-                dbHandler.pushUserRequestData(publicData.getUid(), request);
+                    dbHandler.pushUserRequestData(publicData.getUid(), request);
 
-                privateData.getContacts().put(publicData.getUid(), newRoom.getRoomName());
-                dbHandler.pushUserPrivateData(newRoom.getRoomName(), publicData.getUid());
+                    privateData.getContacts().put(publicData.getUid(), newRoom.getRoomName());
+                    dbHandler.pushUserPrivateData(newRoom.getRoomName(), publicData.getUid());
 
-                startMessage(allUsers.get(user.getUid()), publicData, newRoom.getRoomName());
+                    startMessage(allUsers.get(user.getUid()), publicData, newRoom.getRoomName());
+                }
             }
         }
     }
@@ -249,27 +253,36 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra("user_data", user);
         intent.putExtra("contact_data", contact);
         intent.putExtra("room", room);
+        appStopping = false;
 
         startActivity(intent);
     }
 
     private void buttonPressEvent(View view){
-        Intent intent = null;
-        switch (view.getId()){
-            case R.id.home_CipherButton:
-                Toast.makeText(this, "not Implimented in current version please wait.", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.home_SettingButtton:
-                intent = new Intent(this, ProfileSetupActivity.class);
-                appStopping = false;
-                break;
-            case R.id.home_LogoutButton:
-                intent = new Intent(this, LoginActivity.class);
-                break;
-        }
+        if(!lockInput){
+            Intent intent = null;
+            switch (view.getId()){
+                case R.id.home_CipherButton:
+                    Toast.makeText(this, "not Implimented in current version please wait.", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.home_SettingButtton:
+                    lockInput = true;
+                    intent = new Intent(this, ProfileSetupActivity.class);
+                    intent.putExtra("user", user);
+                    intent.putExtra("home", true);
+                    appStopping = false;
+                    break;
+                case R.id.home_LogoutButton:
+                    lockInput = true;
+                    intent = new Intent(this, LoginActivity.class);
+                    appStopping = false;
+                    auth.signOut();
+                    break;
+            }
 
-        if(intent != null){
-            startActivity(intent);
+            if(intent != null){
+                startActivity(intent);
+            }
         }
     }
 

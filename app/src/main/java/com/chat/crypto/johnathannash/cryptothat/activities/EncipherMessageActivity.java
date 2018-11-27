@@ -28,7 +28,7 @@ public class EncipherMessageActivity extends AppCompatActivity {
     private CipherSpinnerAdapter spinnerAdapter;
     private String room;
     private UserPublicData user, contact;
-    private boolean appStopping = true;
+    private boolean appStopping = true, lockInput = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,33 +124,36 @@ public class EncipherMessageActivity extends AppCompatActivity {
     }
 
     private void onClickEvent(View view){
-        Intent intent = null;
-        switch (view.getId()){
-            case R.id.encipherMessage_backButton:
-                intent = new Intent(this, MessageActivity.class);
-                intent.putExtra("user_data", user);
-                intent.putExtra("contact_data", contact);
-                intent.putExtra("room", room);
-                appStopping = false;
-                break;
-            case R.id.encipherMessage_sendButton:
-                MessageData tempMessage = new MessageData();
-                tempMessage.setSender(user.getUid());
-                tempMessage.setCipher_id(ciphers.getCipherId());
-                tempMessage.setCipher_text(bottomView.getText().toString());
-                tempMessage.setPlain_text(topView.getText().toString());
-                tempMessage.setKey(keyView.getText().toString());
+        if(!lockInput){
+            lockInput = true;
+            Intent intent = null;
+            switch (view.getId()){
+                case R.id.encipherMessage_backButton:
+                    intent = new Intent(this, MessageActivity.class);
+                    intent.putExtra("user_data", user);
+                    intent.putExtra("contact_data", contact);
+                    intent.putExtra("room", room);
+                    appStopping = false;
+                    break;
+                case R.id.encipherMessage_sendButton:
+                    MessageData tempMessage = new MessageData();
+                    tempMessage.setSender(user.getUid());
+                    tempMessage.setCipher_id(ciphers.getCipherId());
+                    tempMessage.setCipher_text(bottomView.getText().toString());
+                    tempMessage.setPlain_text(topView.getText().toString());
+                    tempMessage.setKey(keyView.getText().toString());
 
-                intent = new Intent(this, MessageActivity.class);
-                intent.putExtra("user_data", user);
-                intent.putExtra("contact_data", contact);
-                intent.putExtra("room", room);
-                intent.putExtra("sendMessageData", tempMessage);
-                appStopping = false;
-                break;
-        }
-        if(intent != null){
-            startActivity(intent);
+                    intent = new Intent(this, MessageActivity.class);
+                    intent.putExtra("user_data", user);
+                    intent.putExtra("contact_data", contact);
+                    intent.putExtra("room", room);
+                    intent.putExtra("sendMessageData", tempMessage);
+                    appStopping = false;
+                    break;
+            }
+            if(intent != null){
+                startActivity(intent);
+            }
         }
     }
 

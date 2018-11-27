@@ -9,6 +9,14 @@
     <style name="AppTheme" parent="defaultTheme">
         <item name="android:windowBackground">@color/backgroundColor</item>
         <item name="colorAccent">@color/accentColor</item>
+        <item name="buttonStyle">@style/ButtonTheme</item>
+        <item name="imageButtonStyle">@style/ButtonTheme</item>
+    </style>
+
+    <style name="ButtonTheme" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/button_design</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">@color/mainButtonTextColor</item>
     </style>
 
 </resources>

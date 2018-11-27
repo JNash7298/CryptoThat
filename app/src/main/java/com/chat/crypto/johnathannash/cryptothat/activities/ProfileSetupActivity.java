@@ -32,7 +32,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class ProfileSetupActivity extends AppCompatActivity {
 
-    private boolean unverified, oneWay;
+    private boolean unverified, oneWay, fromHomeScreen, appStopping = true, lockInput = false;
     private FirebaseUser user;
     private FirebaseAuth auth;
     private TextView userName, email;
@@ -49,6 +49,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
         unverified = getIntent().getBooleanExtra("Unverified", false);
         oneWay = getIntent().getBooleanExtra("OneWay", false);
         user = getIntent().getParcelableExtra("user");
+        fromHomeScreen = getIntent().getBooleanExtra("home", false);
         auth = FirebaseAuth.getInstance();
         dbHandler = new FirebaseDBHandler();
 
@@ -91,27 +92,51 @@ public class ProfileSetupActivity extends AppCompatActivity {
     }
 
     private void buttonPress(View view){
-        switch (view.getId()){
-            case R.id.profileSetup_ChangeEmailButton:
-                reauthenticateEmailUpdate();
-                break;
-            case R.id.profileSetup_ChangePasswordButton:
-                break;
-            case R.id.profileSetup_ChangeUsernameButton:
-                requestNewUserName();
-                break;
-            case R.id.profileSetup_ProfileImageChangeButton:
-                Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.profileSetup_ReturnButton:
-                if(unverified){
-                    verifyEmail();
-                }
-                else{
-                    Intent intent = new Intent(this, HomeActivity.class);
-                    startActivity(intent);
-                }
-                break;
+        if(!lockInput){
+            switch (view.getId()){
+                case R.id.profileSetup_ChangeEmailButton:
+                    lockInput = true;
+                    reauthenticateEmailUpdate();
+                    break;
+                case R.id.profileSetup_ChangePasswordButton:
+                    lockInput = true;
+                    auth.sendPasswordResetEmail(user.getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Toast.makeText(ProfileSetupActivity.this,  "Reset password email send to " + user.getEmail() + ".", Toast.LENGTH_LONG).show();
+                            appStopping = false;
+                            Intent intent = new Intent(ProfileSetupActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(ProfileSetupActivity.this,  "Unable to send reset password email to " + user.getEmail() + ".", Toast.LENGTH_LONG).show();
+                            ProfileSetupActivity.this.lockInput = false;
+                        }
+                    });
+                    break;
+                case R.id.profileSetup_ChangeUsernameButton:
+                    lockInput = true;
+                    requestNewUserName();
+                    break;
+                case R.id.profileSetup_ProfileImageChangeButton:
+                    lockInput = true;
+                    Toast.makeText(this, "Not yet implemented", Toast.LENGTH_SHORT).show();
+                    lockInput = false;
+                    break;
+                case R.id.profileSetup_ReturnButton:
+                    appStopping = false;
+                    lockInput = true;
+                    if(unverified){
+                        verifyEmail();
+                    }
+                    else{
+                        Intent intent = new Intent(this, HomeActivity.class);
+                        startActivity(intent);
+                    }
+                    break;
+            }
         }
     }
 
@@ -187,7 +212,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
         popup.show();
     }
 
-    private void updateEmail(final Dialog popup, final FirebaseUser user){
+    private void updateEmail(final Dialog popup, FirebaseUser user){
         user.updateEmail(
                 ((EditText)popup.findViewById(R.id.changeEmailPopup_NewEmail))
                         .getText()
@@ -195,7 +220,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        updateEmailResponse(popup, user);
+                        updateEmailResponse(popup);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -204,6 +229,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
                         Log.d(TAG, e.toString());
                     }
                 });
+        lockInput = false;
     }
 
     private void updateUsername(final Dialog popup, final FirebaseUser user){
@@ -215,7 +241,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
         user.updateProfile(changeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                updateUsernameResponse(popup, user);
+                updateUsernameResponse(popup);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -224,13 +250,15 @@ public class ProfileSetupActivity extends AppCompatActivity {
                 Log.d(TAG, e.toString());
             }
         });
+        lockInput = false;
     }
 
     private void message(Exception e){
         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-    private void updateEmailResponse(Dialog popup, FirebaseUser user){
+    private void updateEmailResponse(Dialog popup){
+        user = auth.getCurrentUser();
         if(!email.getText().equals(user.getEmail())){
             Toast.makeText(this,
                     "Email was set to " + user.getEmail()
@@ -240,7 +268,8 @@ public class ProfileSetupActivity extends AppCompatActivity {
         popup.dismiss();
     }
 
-    private void updateUsernameResponse(Dialog popup, FirebaseUser user){
+    private void updateUsernameResponse(Dialog popup){
+        user = auth.getCurrentUser();
         if(!userName.getText().equals(user.getDisplayName())){
             Toast.makeText(this,
                     "Username was set to " + user.getDisplayName()
@@ -284,7 +313,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        if(!oneWay && !user.isEmailVerified()){
+        if(!oneWay && !user.isEmailVerified() && !fromHomeScreen){
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
@@ -293,7 +322,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        if(!user.isEmailVerified()){
+        if(!fromHomeScreen && !user.isEmailVerified()){
             auth.signOut();
             oneWay = false;
         }
@@ -302,8 +331,12 @@ public class ProfileSetupActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(!user.isEmailVerified()){
+        if(appStopping){
             auth.signOut();
+        }else{
+            if(!fromHomeScreen && !user.isEmailVerified()){
+                auth.signOut();
+            }
         }
     }
 }

@@ -26,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "Login";
     private FirebaseAuth auth;
     public LoginDataModel loginData;
+    private boolean lockInput = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,20 +95,23 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void buttonPressed(View view){
-        Intent intent = null;
-        switch (view.getId()){
-            case R.id.LoginButton:
-                loginAttempt();
-                break;
-            case R.id.login_RegisterButton:
-                intent = new Intent(this, RegisterActivity.class);
-                break;
-            case R.id.login_ForgotPassword:
-                intent = new Intent(this, ForgotPasswordActivity.class);
-                break;
-        }
-        if(intent != null){
-            startActivity(intent);
+        if(!lockInput){
+            lockInput = true;
+            Intent intent = null;
+            switch (view.getId()){
+                case R.id.LoginButton:
+                    loginAttempt();
+                    break;
+                case R.id.login_RegisterButton:
+                    intent = new Intent(this, RegisterActivity.class);
+                    break;
+                case R.id.login_ForgotPassword:
+                    intent = new Intent(this, ForgotPasswordActivity.class);
+                    break;
+            }
+            if(intent != null){
+                startActivity(intent);
+            }
         }
     }
 
@@ -168,6 +172,9 @@ public class LoginActivity extends AppCompatActivity {
                 intent.putExtra("user", user);
             }
             startActivity(intent);
+        }
+        else{
+            lockInput = false;
         }
     }
 }

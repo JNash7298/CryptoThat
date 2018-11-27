@@ -33,6 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private String TAG = "Register";
     private RegisterDataModel registerData;
+    private boolean lockInput = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,68 +119,72 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registerAttempt() {
-        Boolean emptyFields;
-        StringBuilder missingFields = new StringBuilder();
-        ArrayList<String> missing = new ArrayList<>();
+        if(!lockInput) {
+            Boolean emptyFields;
+            StringBuilder missingFields = new StringBuilder();
+            ArrayList<String> missing = new ArrayList<>();
 
-        if((emptyFields = (registerData.getEmail() == null
-                || registerData.getEmail().isEmpty()))){
-            missing.add("Email");
-        }
-        if(emptyFields
-                || (emptyFields = (registerData.getUserName() == null
-                || registerData.getUserName().isEmpty()))){
-            missing.add("Username");
-        }
-        if(emptyFields
-                || (emptyFields = (registerData.getPassWord() == null
-                || registerData.getPassWord().isEmpty()))){
-            missing.add("Password");
-        }
-        if(emptyFields
-                || (emptyFields = (registerData.getConfirmationPassWord() == null
-                || registerData.getConfirmationPassWord().isEmpty()))){
-            missing.add("Password Confirmation");
-        }
-
-        if(!emptyFields){
-            if(registerData.getUserName().equalsIgnoreCase("admin")){
-                Toast.makeText(this,
-                        "The user name " + registerData.getUserName() + " is not a usable username."
-                        , Toast.LENGTH_SHORT).show();
-            } else if(!registerData.getPassWord().equals(registerData.getConfirmationPassWord())) {
-                Toast.makeText(this,
-                        "Password and confirmation password are not the same."
-                        , Toast.LENGTH_SHORT).show();
-            } else if(registerData.getPassWord().length() < 6){
-                Toast.makeText(this,
-                        "Password is too simple, you need a password of a minimum a 6 characters in length."
-                        , Toast.LENGTH_SHORT).show();
-            } else{
-                auth.createUserWithEmailAndPassword(registerData.getEmail(), registerData.getPassWord())
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                checkIfSuccessfulRegister(task);
-                            }
-                        });
+            if ((emptyFields = (registerData.getEmail() == null
+                    || registerData.getEmail().isEmpty()))) {
+                missing.add("Email");
             }
-        } else{
-            missingFields.append("You are missing");
-            for(int field = 0; field < missing.size(); field++){
-                if(missing.size() > 1 && field == missing.size() - 1){
-                       missingFields.append(", and ").append(missing.get(field));
-                } else{
-                    missingFields.append(", ").append(missing.get(field));
+            if (emptyFields
+                    || (emptyFields = (registerData.getUserName() == null
+                    || registerData.getUserName().isEmpty()))) {
+                missing.add("Username");
+            }
+            if (emptyFields
+                    || (emptyFields = (registerData.getPassWord() == null
+                    || registerData.getPassWord().isEmpty()))) {
+                missing.add("Password");
+            }
+            if (emptyFields
+                    || (emptyFields = (registerData.getConfirmationPassWord() == null
+                    || registerData.getConfirmationPassWord().isEmpty()))) {
+                missing.add("Password Confirmation");
+            }
+
+            if (!emptyFields) {
+                if (registerData.getUserName().equalsIgnoreCase("admin")) {
+                    Toast.makeText(this,
+                            "The user name " + registerData.getUserName() + " is not a usable username."
+                            , Toast.LENGTH_SHORT).show();
+                } else if (!registerData.getPassWord().equals(registerData.getConfirmationPassWord())) {
+                    Toast.makeText(this,
+                            "Password and confirmation password are not the same."
+                            , Toast.LENGTH_SHORT).show();
+                } else if (registerData.getPassWord().length() < 6) {
+                    Toast.makeText(this,
+                            "Password is too simple, you need a password of a minimum a 6 characters in length."
+                            , Toast.LENGTH_SHORT).show();
+                } else {
+                    auth.createUserWithEmailAndPassword(registerData.getEmail(), registerData.getPassWord())
+                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    checkIfSuccessfulRegister(task);
+                                }
+                            });
                 }
+            } else {
+                missingFields.append("You are missing");
+                for (int field = 0; field < missing.size(); field++) {
+                    if (missing.size() > 1 && field == missing.size() - 1) {
+                        missingFields.append(", and ").append(missing.get(field));
+                    } else {
+                        missingFields.append(", ").append(missing.get(field));
+                    }
+                }
+                missingFields.append(".");
+                Toast.makeText(this, missingFields.toString(), Toast.LENGTH_LONG).show();
+                ;
             }
-            missingFields.append(".");
-            Toast.makeText(this, missingFields.toString(), Toast.LENGTH_LONG).show();;
         }
     }
 
     private void checkIfSuccessfulRegister(Task<AuthResult> task){
         if (task.isSuccessful()) {
+            lockInput = true;
             Log.d(TAG, "createUserWithEmail:success");
             final FirebaseUser user = auth.getCurrentUser();
 

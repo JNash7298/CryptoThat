@@ -23,7 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- <activity android:name=".activities.MainActivity" /> -->
         <activity android:name=".activities.HomeActivity" />
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.RegisterActivity" />
@@ -32,7 +31,7 @@
         <activity android:name=".activities.ProfileSetupActivity" />
         <activity android:name=".activities.EncipherMessageActivity" />
         <activity android:name=".activities.DecipherMessageActivity" />
-        <activity android:name=".activities.NewCustomCipher"></activity>
+        <activity android:name=".activities.NewCustomCipher"/>
     </application>
 
 </manifest>

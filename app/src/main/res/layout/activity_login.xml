@@ -13,7 +13,7 @@
         android:layout_height="125dp"
         android:contentDescription="@string/LogoBannerDescription"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/placeholder" />
+        app:srcCompat="@drawable/banner" />
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

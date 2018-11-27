@@ -20,4 +20,9 @@
     <color name="backgroundColor">#f0ffff</color>
     <color name="selectColor">#64c8c8</color>
     <color name="accentColor">#da70d6</color>
+    <color name="mainButtonColorPressed">#b388ff</color>
+    <color name="mainButtonColor">#da70d6</color>
+    <color name="edgeButtonColor">#1de9b6</color>
+    <color name="edgeButtonColorPressed">#f0ffff</color>
+    <color name="mainButtonTextColor">#ffffff</color>
 </resources>

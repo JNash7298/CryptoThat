@@ -27,7 +27,7 @@
             android:layout_height="125dp"
             android:contentDescription="@string/LogoBannerDescription"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/placeholder" />
+            app:srcCompat="@drawable/banner" />
     </RelativeLayout>
 
     <LinearLayout

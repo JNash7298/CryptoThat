@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.chat.crypto.johnathannash.cryptothat.R;
 import com.chat.crypto.johnathannash.cryptothat.activities.LoginActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +27,7 @@ public class ForgotPasswordSubmitEmailFragment extends Fragment {
     private View view;
     private String email;
     private FirebaseAuth auth;
+    private boolean lockInput = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,14 +87,18 @@ public class ForgotPasswordSubmitEmailFragment extends Fragment {
     }
 
     private void buttonPressEvent(View view){
-        switch (view.getId()){
-            case R.id.forgotPassword_EmailSubmitButton:
-                sendEmail();
-                break;
-            case R.id.forgotPassword_ReturnButton:
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
-                break;
+        if(!lockInput){
+            switch (view.getId()){
+                case R.id.forgotPassword_EmailSubmitButton:
+                    lockInput = true;
+                    sendEmail();
+                    break;
+                case R.id.forgotPassword_ReturnButton:
+                    lockInput = true;
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                    break;
+            }
         }
     }
 
@@ -104,9 +110,15 @@ public class ForgotPasswordSubmitEmailFragment extends Fragment {
         auth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                Toast.makeText(getActivity(), "Reset password email send to " + email + ".", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Reset password email send to " + email + ".", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                lockInput = false;
+                Toast.makeText(getActivity(), "Unable to send reset password email to " + email + ".", Toast.LENGTH_LONG).show();
             }
         });
     }
