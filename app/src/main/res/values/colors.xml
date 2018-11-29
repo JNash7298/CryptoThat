@@ -25,4 +25,5 @@
     <color name="edgeButtonColor">#1de9b6</color>
     <color name="edgeButtonColorPressed">#f0ffff</color>
     <color name="mainButtonTextColor">#ffffff</color>
+    <color name="ribbonColor">#f02163</color>
 </resources>

@@ -28,6 +28,7 @@ public class CipherProgram {
         //this is temp data
         cipherNamesAndIds.add(new CipherSpinnerData("regular", "1"));
         cipherNamesAndIds.add(new CipherSpinnerData("ceasar", "2"));
+        cipherNamesAndIds.add(new CipherSpinnerData("affine", "3"));
 
         setupBaseAlphabet();
     }
@@ -80,9 +81,49 @@ public class CipherProgram {
                     int keyValue = Integer.parseInt(key);
                     for(char character : plainText.toCharArray()){
                         if(characterValues.containsKey(character)){
-                            cipherText.append(byteCharacters.get((characterValues.get(character) + keyValue) % characterValues.size()));
+                            int characterValue = characterValues.get(character);
+                            int alteredValue = characterValue + keyValue;
+                            char newCharacter;
+                            if(alteredValue >= 0){
+                                newCharacter = byteCharacters.get(alteredValue % characterValues.size());
+                            }
+                            else{
+                                int adjust = (Math.abs(alteredValue) / characterValues.size());
+                                int newValue = alteredValue + characterValues.size() * adjust;
+                                if(newValue < 0){
+                                    newValue += characterValues.size();
+                                }
+                                newCharacter = byteCharacters.get(newValue);
+                            }
+                            cipherText.append(newCharacter);
                         }
                         else{
+                            cipherText.append(character);
+                        }
+                    }
+                    break;
+                case "3":
+                    int affineKeyValue = Integer.parseInt(key.split(":")[0]);
+                    int transformationValue = Integer.parseInt(key.split(":")[1]);
+                    int alphabetSize = characterValues.size();
+                    for(char character : plainText.toCharArray()){
+                        if(characterValues.containsKey(character)){
+                            char newCharacter;
+                            int characterValue = characterValues.get(character);
+                            int alteredValue = (affineKeyValue * characterValue) + transformationValue;
+                            if(alteredValue >= 0){
+                                newCharacter = byteCharacters.get(alteredValue % alphabetSize);
+                            }
+                            else{
+                                int adjust = (Math.abs(alteredValue) / alphabetSize);
+                                int newValue = alteredValue + (alphabetSize * adjust);
+                                if(newValue < 0){
+                                    newValue += alphabetSize;
+                                }
+                                newCharacter = byteCharacters.get(newValue);
+                            }
+                            cipherText.append(newCharacter);
+                        }else{
                             cipherText.append(character);
                         }
                     }
@@ -112,15 +153,43 @@ public class CipherProgram {
                             }
                             else{
                                 int adjust = (Math.abs(alteredValue) / characterValues.size());
-                                if(adjust != (Math.abs(alteredValue) / (double)characterValues.size())){
-                                    adjust++;
+                                int newValue = alteredValue + (characterValues.size() * adjust);
+                                if(newValue < 0){
+                                    newValue += characterValues.size();
                                 }
-                                int newValue = alteredValue + characterValues.size() * adjust;
                                 newCharacter = byteCharacters.get(newValue);
                             }
                             plainText.append(newCharacter);
                         }
                         else{
+                            plainText.append(character);
+                        }
+                    }
+                    break;
+                case "3":
+                    int affineKeyValue = Integer.parseInt(key.split(":")[0]);
+                    int transformationValue = Integer.parseInt(key.split(":")[1]);
+                    int alphabetSize = characterValues.size();
+                    int inverseAffineKeyValue = modularInverse(affineKeyValue, alphabetSize);
+
+                    for(char character : cipherText.toCharArray()){
+                        if(characterValues.containsKey(character)){
+                            char newCharacter;
+                            int characterValue = characterValues.get(character);
+                            int alteredValue = inverseAffineKeyValue * (characterValue - transformationValue);
+                            if(alteredValue >= 0){
+                                newCharacter = byteCharacters.get(alteredValue % alphabetSize);
+                            }
+                            else{
+                                int adjust = (Math.abs(alteredValue) / alphabetSize);
+                                int newValue = alteredValue + (alphabetSize * adjust);
+                                if(newValue < 0){
+                                    newValue += alphabetSize;
+                                }
+                                newCharacter = byteCharacters.get(newValue);
+                            }
+                            plainText.append(newCharacter);
+                        }else{
                             plainText.append(character);
                         }
                     }
@@ -134,19 +203,85 @@ public class CipherProgram {
     public boolean checkIfKeyIsValid(String key){
         boolean isValidKey = false;
         if(cipherId != null){
-            if(cipherId.equals("1")){
-                isValidKey = true;
-            }
-            else if(cipherId.equals("2")){
-                try {
-                    Integer.parseInt(key);
+            switch (cipherId){
+                case "1":
                     isValidKey = true;
-                } catch (NumberFormatException e) {
-                    isValidKey = false;
-                }
+                    break;
+                case "2":
+                    try {
+                        Integer.parseInt(key);
+                        isValidKey = true;
+                    } catch (NumberFormatException e) {
+                        isValidKey = false;
+                    }
+                    break;
+                case "3":
+                    if(key.split(":").length == 2){
+                        String affineNumberString = key.split(":")[0];
+                        String transformationNumberString = key.split(":")[1];
+                        try{
+                            Integer.parseInt(transformationNumberString);
+                            int affineNumberInt = Integer.parseInt(affineNumberString);
+                            if(affineNumberInt > 0 && affineNumberInt < characterValues.size()){
+                                isValidKey = isCoprime(affineNumberInt, characterValues.size());
+                            }
+                        } catch (NumberFormatException e){
+                            isValidKey = false;
+                        }
+                    }
+                    break;
             }
         }
         return isValidKey;
+    }
+
+    //finds the modular inverse of coprime numbers
+    private int modularInverse(int number, int mod){
+        int inverse;
+
+        if(number >= 0){
+           number %= mod;
+        }
+        else{
+            int adjust = number / mod;
+            number = number + (mod * adjust);
+            if(number < 0){
+                number += mod;
+            }
+        }
+
+        for(inverse = 1; inverse < mod && (number * inverse) % mod != 1; inverse++){
+        }
+
+        return inverse;
+    }
+
+    //this is to find the greatest common divisor
+    private int greatestCommonDivisor(int firstNumber, int secondNumber){
+        if(firstNumber >= 0 && secondNumber >= 0){
+            if(firstNumber < secondNumber){
+                int tempNumber = firstNumber;
+                firstNumber = secondNumber;
+                secondNumber = tempNumber;
+            }
+            int remainder = firstNumber % secondNumber;
+
+            if(remainder == 0){
+                return secondNumber;
+            }
+
+            return greatestCommonDivisor(secondNumber, remainder);
+        }
+        else {
+            return -1;
+        }
+    }
+
+    //this is to tell if two numbers are coprime
+    private boolean isCoprime(int firstNumber, int secondNumber){
+        boolean isCoprime;
+        isCoprime = greatestCommonDivisor(firstNumber, secondNumber) == 1;
+        return isCoprime;
     }
 
     //this is to be implemented later when ciphers are dynamic

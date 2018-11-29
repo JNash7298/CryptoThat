@@ -107,6 +107,7 @@
         android:layout_margin="20dp"
         android:background="@color/transparentBackground"
         android:ems="10"
+        android:focusable="false"
         android:gravity="top"
         android:hint="@string/encipher_CipherTextHint"
         android:inputType="none"

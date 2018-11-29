@@ -55,12 +55,13 @@ public class UserPublicData implements Parcelable {
     @Override
     public boolean equals(Object obj){
         boolean isEqual = false;
-
-        if(obj instanceof UserPublicData){
-            if(((UserPublicData) obj).getUid().equals(getUid())){
-                if(((UserPublicData)obj).getName().equals(getName())){
-                    if(((UserPublicData) obj).getAvatar().equals(getAvatar())){
-                        isEqual = true;
+        if(obj != null){
+            if(obj instanceof UserPublicData){
+                if(((UserPublicData) obj).getUid().equals(getUid())){
+                    if(((UserPublicData)obj).getName().equals(getName())){
+                        if(((UserPublicData) obj).getAvatar().equals(getAvatar())){
+                            isEqual = true;
+                        }
                     }
                 }
             }
